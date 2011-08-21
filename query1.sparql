@@ -1,0 +1,6 @@
+SELECT *
+FROM NAMED <http://www.imis.uni-luebeck.de/mate/graphs#sensor>
+FROM NAMED <http://www.imis.uni-luebeck.de/mate/graphs#history>
+{
+  ?s ?p ?o .
+}

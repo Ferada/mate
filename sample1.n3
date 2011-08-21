@@ -1,0 +1,22 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+@prefix mate: <http://www.imis.uni-luebeck.de/mate#> .
+@prefix sensors: <http://www.imis.uni-luebeck.de/mate/sensors#> .
+@prefix : <http://www.imis.uni-luebeck.de/mate/sensors#> .
+
+# this is a sample sensor value
+# we don't have an ontology yet, so this is just a mockup basically
+
+[] :foo "bar" .
+
+# rdf:type / a is the marker
+[] a :AvailabilitySensorValue ;
+   :jid "olof@jabber.imis.uni-luebeck.de" ;
+   :available "true"^^xsd:boolean .
+
+[] a :AvailabilitySensorValue ;
+   :jid "jörg@jabber.imis.uni-luebeck.de" ;
+   :available "false"^^xsd:boolean .
