@@ -472,7 +472,7 @@ public class Whiteboard implements Board, Runnable {
 	/* get the schema for its type */
 	MateClass klass = ontology.getClass (typeUri);
 	if (klass == null) {
-	  logger.error ("no schema for type " + typeUri + ", skipping this update");
+	  logger.error ("no schema for type " + typeResource.getLocalName () + ", skipping this update");
 	  continue;
 	}
 

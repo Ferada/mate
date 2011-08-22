@@ -23,7 +23,7 @@ public class MateClass {
   public static MateClass create (OntClass typeClass) {
     Statement statement = typeClass.getProperty (Mate.primaryKey);
     if (statement == null) {
-      logger.warn ("there is no primary key defined for type " + typeClass + ", can't create class");
+      logger.warn ("there is no primary key defined for type " + typeClass.getLocalName () + ", can't create class");
       return null;
     }
 
@@ -39,5 +39,13 @@ public class MateClass {
   private MateClass (OntClass base, List<Property> primaryKey) {
     this.base = base;
     this.primaryKey = primaryKey;
+  }
+
+  public String toString () {
+    String label = base.getLabel (null);
+    if (label == null)
+      return "MateClass@<" + base.getLocalName () + ">";
+    else
+      return "MateClass@<" + label + ">";
   }
 }

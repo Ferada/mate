@@ -51,7 +51,6 @@ public class MateOntology {
     for (Resource resource : set) {
       String uri = resource.getURI ();
 
-      /* TODO: is (OntClass) getOntResource (resource) possible? */
       OntClass klass = model.getOntClass (uri);
 
       if (klass == null) {
@@ -64,8 +63,8 @@ public class MateOntology {
 	classes.put (mateClass.base.getURI (), mateClass);
     }
 
-    for (String string : classes.keySet ())
-      logger.info ("ontology class " + string);
+    for (MateClass klass : classes.values ())
+      logger.info ("ontology class " + klass);
   }
 
   public MateClass getClass (String uri) {

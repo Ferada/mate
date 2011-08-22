@@ -34,8 +34,8 @@
      -->
 
     <owl:AnnotationProperty rdf:about="&mate;primaryKey">
-        <rdfs:comment xml:lang="de">Definiert einen Primärschlüssel der angegebenen Klasse. Diese Funktion wird von der MATe Whiteboard-Implementierung benutzt um beispielsweise Sensordaten in die Datenbank zu speichern und Histories darüber anzulegen.</rdfs:comment>
         <rdfs:comment xml:lang="en">Defines one of the primary keys of the given class. This is used by the MATe Whiteboard implementation for example to merge new sensor values into the database and create histories on them.</rdfs:comment>
+        <rdfs:comment xml:lang="de">Definiert einen Primärschlüssel der angegebenen Klasse. Diese Funktion wird von der MATe Whiteboard-Implementierung benutzt um beispielsweise Sensordaten in die Datenbank zu speichern und Histories darüber anzulegen.</rdfs:comment>
     </owl:AnnotationProperty>
     
 

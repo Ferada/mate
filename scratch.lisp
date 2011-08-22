@@ -25,3 +25,6 @@
 
 (defun rdf-uri ()
   (jstatic "getURI" "com.hp.hpl.jena.vocabulary.RDF"))
+
+(defun load-ontology (pathname &optional (language "RDF/XML"))
+  (jstatic "loadOntology" "board.Whiteboard" pathname language))
