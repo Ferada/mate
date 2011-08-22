@@ -1,5 +1,7 @@
 package board;
 
+import org.slf4j.*;
+
 import com.hp.hpl.jena.util.*;
 import com.hp.hpl.jena.graph.*;
 import com.hp.hpl.jena.query.*;
@@ -28,6 +30,11 @@ import board.vocabulary.*;
  * May be run within a thread.
  */
 public class Whiteboard implements Board, Runnable {
+  /**
+   *
+   */
+  private static Logger logger = LoggerFactory.getLogger (Whiteboard.class);
+
   /**
    * Contains the public world knowledge (except sensor data).
    */
@@ -121,8 +128,47 @@ public class Whiteboard implements Board, Runnable {
     sensorStore = GraphStoreFactory.create (sensorValues);
     historyStore = GraphStoreFactory.create (historyValues);
 
+    // logger.info ("cache models = " + OntDocumentManager.getInstance ().getCacheModels ());
+    // OntDocumentManager.getInstance ().setCacheModels (true);
+
+    /* TODO: this could be done better, i.e. set the paths for the file
+       manager and then only request the documents by their URI.  so if
+       we can actually get them from the URI, we might do so instead of
+       having local copies.
+       i.e.:
+       FileManager.get ().addAltEntry (Mate.uri..., "localMate.owl");
+       ...
+       mateOntology = FileManaget.get ().loadModel (Mate.uri ...)
+    */
     mateOntology = loadOntology ("mate.owl", "RDF/XML");
+    /* maps the mateOntology object to the URI, */
+    /* TODO: except this doesn't work as expected, i.e. the model is probably copied */
+    OntDocumentManager.getInstance ().addModel (Mate.uri.substring (0, Mate.uri.length () - 1), mateOntology.model, true);
+    /* ... so this ontology can properly import its classes.  this creates
+       duplicate classes for the mate ontology, but that is no problem atm */
     sensorOntology = loadOntology ("sensors.owl", "RDF/XML");
+    sensorOntology.addBaseOntology (mateOntology);
+
+    /* and here the cached model from above isn't shown */
+    // {
+    //   Iterator<String> it = OntDocumentManager.getInstance ().listDocuments ();
+    //   while (it.hasNext ()) {
+    // 	logger.info ("document " + it);
+    //   }
+    // }
+
+    // logger.info ("mate ontology at " + Integer.toHexString (mateOntology.model.hashCode ()));
+    // logger.info ("sensor ontology at " + Integer.toHexString (sensorOntology.model.hashCode ()));
+    // logger.info ("=? " + (mateOntology.model == sensorOntology.model));
+
+    // Iterator<OntModel> it = mateOntology.model.listSubModels (true);
+    // while (it.hasNext ()) {
+    //   logger.info ("mate imported model " + Integer.toHexString (it.next ().hashCode ()));
+    // }
+    // it = sensorOntology.model.listSubModels (true);
+    // while (it.hasNext ()) {
+    //   logger.info ("sensor imported model " + Integer.toHexString (it.next ().hashCode ()));
+    // }
 
     clients = new ArrayList<Client> ();
     privateModels = new HashMap<Client, Model> ();
@@ -158,7 +204,7 @@ public class Whiteboard implements Board, Runnable {
    * @see loadRdf, ModelFactory.createOntologyModel
    */
   public static MateOntology loadOntology (String pathname, String lang) throws FileNotFoundException {
-    return new MateOntology ((OntModel) loadRdf (pathname, lang, ModelFactory.createOntologyModel()));
+    return new MateOntology (loadRdf (pathname, lang, ModelFactory.createDefaultModel()));
   }
 
   /**
@@ -340,24 +386,13 @@ public class Whiteboard implements Board, Runnable {
     PathBlock pattern = block.getPattern ();
     pattern.add (new TriplePath (new Triple (var_marker, RDF.Nodes.type, type.asNode ())));
 
-    // ElementPathBlock block = (ElementPathBlock) group.getElements ().get (0);
-    // PathBlock pattern = block.getPattern ();
-    // TriplePath path = pattern.get (0);
-    // pattern.getList ().clear ();
-    // pattern.add (new
-
     addPrimaryKeyChecks (Var.alloc ("marker"), marker, klass, pattern);
 
-    System.out.println ("matching query = \n" + query + "\n---");
+    logger.debug ("matching query = \n" + query + "\n---");
 
     /* construct query according to schema */
-
-    QuerySolutionMap bindings = new QuerySolutionMap ();
-    bindings.add ("type", type);
-
     for (Model model : privateModels.values ()) {
       QueryExecution exec = QueryExecutionFactory.create (query, model);
-      exec.setInitialBinding (bindings);
       try {
 	ResultSet results = exec.execSelect ();
 	while (results.hasNext ()) {
@@ -375,38 +410,38 @@ public class Whiteboard implements Board, Runnable {
 
   public void postWorldUpdate (Client poster, Model model) {
     if (!isConsistent (mateOntology, model)) {
-      System.out.println ("update isn't consistent with respect to the mate ontology, discarding");
+      logger.warn ("update isn't consistent with respect to the mate ontology, discarding");
       return;
     }
 
     postGenericUpdate (mateOntology, poster, model, false);
 
-    System.out.println ("world values are now");
-    worldModel.write (System.out, "N3");
-    System.out.println ("---");
+    // System.out.println ("world values are now");
+    // worldModel.write (System.out, "N3");
+    // System.out.println ("---");
 
-    System.out.println ("private values are now");
-    for (Client client : clients) {
-      System.out.println ("Client " + client.getName () + ", <" + client + ">:");
-      getPrivateModel (client).write (System.out, "N3");
-      System.out.println ("---");
-    }
+    // System.out.println ("private values are now");
+    // for (Client client : clients) {
+    //   System.out.println ("Client " + client.getName () + ", <" + client + ">:");
+    //   getPrivateModel (client).write (System.out, "N3");
+    //   System.out.println ("---");
+    // }
   }
 
   public void postSensorUpdate (Client poster, Model model) {
     if (!isConsistent (sensorOntology, model)) {
-      System.out.println ("update isn't consistent with respect to the sensor ontology, discarding");
+      logger.warn ("update isn't consistent with respect to the sensor ontology, discarding");
       return;
     }
 
     if (poster instanceof Reasoner)
-      System.out.println ("a reasoner probably shouldn't post sensor value updates");
+      logger.warn ("a reasoner probably shouldn't post sensor value updates");
 
     postGenericUpdate (sensorOntology, poster, model, true);
 
-    System.out.println ("sensor values are now");
-    sensorValues.write (System.out, "N3");
-    System.out.println ("---");
+    // System.out.println ("sensor values are now");
+    // sensorValues.write (System.out, "N3");
+    // System.out.println ("---");
   }
 
   /**
@@ -437,7 +472,7 @@ public class Whiteboard implements Board, Runnable {
 	/* get the schema for its type */
 	MateClass klass = ontology.getClass (typeUri);
 	if (klass == null) {
-	  System.out.println ("no schema for type " + typeUri + ", skipping this update");
+	  logger.error ("no schema for type " + typeUri + ", skipping this update");
 	  continue;
 	}
 
@@ -479,7 +514,7 @@ public class Whiteboard implements Board, Runnable {
 	//   insertPattern.addTriple (it.nextStatement ().asTriple ());
 	// }
 
-	System.out.println ("deleteRequest " + deleteRequest + "---");
+	logger.debug ("deleteRequest " + deleteRequest);
 
 	UpdateProcessor deleteExec = UpdateExecutionFactory.create (deleteRequest, sensorStore);
 	deleteExec.execute ();
@@ -567,7 +602,7 @@ public class Whiteboard implements Board, Runnable {
     pattern.add (new TriplePath (new Triple (var_entry, Node.createURI (Mate.historyType.getURI ()), typeResource.asNode ())));
     addPrimaryKeyChecks (var_entry, markerResource, klass, pattern);
 
-    System.out.println ("matching query = \n" + query + "\n---");
+    logger.debug ("matching query = " + query);
 
     /* construct query according to schema */
 
@@ -580,7 +615,7 @@ public class Whiteboard implements Board, Runnable {
 	QuerySolution solution = results.next ();
 	entry = solution.get ("entry").asResource ();
 
-	System.out.println ("entry = " + entry);
+	logger.debug ("entry = " + entry);
 
 	Statement entries = entry.getProperty (Mate.historyEntries);
 	list = entries.getObject ().asResource ();
@@ -638,9 +673,9 @@ public class Whiteboard implements Board, Runnable {
       exec.close ();
     }
 
-    System.out.println ("history values are = ---");
-    historyValues.write (System.out, "N3");
-    System.out.println ("\n---");
+    // System.out.println ("history values are = ---");
+    // historyValues.write (System.out, "N3");
+    // System.out.println ("\n---");
   }
 
   /**
@@ -664,7 +699,7 @@ public class Whiteboard implements Board, Runnable {
     source.addNamedModel ("http://www.imis.uni-luebeck.de/mate/graphs#sensor", sensorValues);
     source.addNamedModel ("http://www.imis.uni-luebeck.de/mate/graphs#history", historyValues);
 
-    System.out.println ("executing " + query);
+    logger.debug ("executing " + query);
 
     QueryExecution exec = QueryExecutionFactory.create (query, source);
     try {
@@ -672,7 +707,7 @@ public class Whiteboard implements Board, Runnable {
       while (results.hasNext ()) {
     	QuerySolution solution = results.next ();
 
-	System.out.println ("solution " + solution);
+	logger.debug ("solution " + solution);
       }
     }
     finally {

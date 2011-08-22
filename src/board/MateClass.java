@@ -1,5 +1,7 @@
 package board;
 
+import org.slf4j.*;
+
 import com.hp.hpl.jena.ontology.*;
 import com.hp.hpl.jena.rdf.model.*;
 
@@ -8,6 +10,8 @@ import java.util.*;
 import board.vocabulary.*;
 
 public class MateClass {
+  private static Logger logger = LoggerFactory.getLogger (MateClass.class);
+
   public OntClass base;
 
   public List<Property> primaryKey;
@@ -19,7 +23,7 @@ public class MateClass {
   public static MateClass create (OntClass typeClass) {
     Statement statement = typeClass.getProperty (Mate.primaryKey);
     if (statement == null) {
-      System.out.println ("there is no primary key defined for type " + typeClass);
+      logger.warn ("there is no primary key defined for type " + typeClass + ", can't create class");
       return null;
     }
 

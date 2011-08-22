@@ -1,32 +1,24 @@
 package board;
 
+import org.slf4j.*;
+
 import java.util.*;
 
 import com.hp.hpl.jena.rdf.model.*;
 
 public class LoggingClient implements Client {
+  private static Logger logger = LoggerFactory.getLogger (LoggingClient.class);
+
   public String getName () {
     return "LoggingClient";
   }
 
   public void postUpdate (Board board, Model model) {
-    System.out.println ("got an update");
-    model.write (System.out, "N3");
-
-    // for (Iterator <Statement> it = model.listStatements (); it.hasNext ();) {
-    //   Statement stm = it.next ();
-
-    //   Resource subject = stm.getSubject ();
-    //   Property predicate = stm.getPredicate ();
-    //   RDFNode object = stm.getObject ();
-
-    //   System.out.println ("subject = " + subject);
-    //   System.out.println ("predicate = " + predicate);
-    //   System.out.println ("object = " + object);
-    // }
+    logger.info ("got an update");
+    // model.write (System.out, "N3");
   }
 
   public void run () {
-    System.out.println ("running, sort of");
+    logger.info ("running, sort of");
   }
 }

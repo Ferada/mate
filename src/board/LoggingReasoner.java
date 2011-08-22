@@ -1,38 +1,30 @@
 package board;
 
+import org.slf4j.*;
+
 import java.util.*;
 
 import com.hp.hpl.jena.rdf.model.*;
 
 public class LoggingReasoner implements Reasoner {
+  private static Logger logger = LoggerFactory.getLogger (LoggingReasoner.class);
+
   public String getName () {
     return "LoggingReasoner";
   }
 
-  public void postTrainingUpdate (Model training, Model result) {
-    System.out.println ("got a training update");
-    training.write (System.out, "N3");
-    result.write (System.out, "N3");
+  public void postUpdate (Board board, Model model) {
+    logger.info ("got an update");
+    // model.write (System.out, "N3");
   }
 
-  public void postUpdate (Board board, Model model) {
-    System.out.println ("got an update");
-    model.write (System.out, "N3");
-
-    // for (Iterator <Statement> it = model.listStatements (); it.hasNext ();) {
-    //   Statement stm = it.next ();
-
-    //   Resource subject = stm.getSubject ();
-    //   Property predicate = stm.getPredicate ();
-    //   RDFNode object = stm.getObject ();
-
-    //   System.out.println ("subject = " + subject);
-    //   System.out.println ("predicate = " + predicate);
-    //   System.out.println ("object = " + object);
-    // }
+  public void postTrainingUpdate (Model training, Model result) {
+    logger.info ("got a training update");
+    // training.write (System.out, "N3");
+    // result.write (System.out, "N3");
   }
 
   public void run () {
-    System.out.println ("running, sort of");
+    logger.info ("running, sort of");
   }
 }

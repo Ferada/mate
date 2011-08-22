@@ -22,3 +22,6 @@
 
 (defun parse (string)
   (jstatic "create" "com.hp.hpl.jena.query.QueryFactory" string))
+
+(defun rdf-uri ()
+  (jstatic "getURI" "com.hp.hpl.jena.vocabulary.RDF"))

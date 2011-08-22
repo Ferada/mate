@@ -3,6 +3,8 @@
 ABCL=/usr/share/abcl/lib/abcl.jar
 MAIN=org.armedbear.lisp.Main
 
+LIBS="$LIBS $ABCL"
+
 cd /home/rudolf/uni/masterarbeit/mate/
 
-exec java -cp bin:src:$(echo lib/*.jar | tr ' ' ':'):$ABCL $MAIN "$*"
+MAIN=$MAIN LIBS=$LIBS exec sh run.sh "$*"
