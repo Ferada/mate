@@ -54,7 +54,7 @@ public class MateOntology {
       OntClass klass = model.getOntClass (uri);
 
       if (klass == null) {
-	logger.error ("there is no OntClass with URI " + uri + ", even though we extracted that earlier");
+	logger.error ("there is no OntClass with URI " + uri + ", even though we extracted that earlier, skipping");
 	continue;
       }
 

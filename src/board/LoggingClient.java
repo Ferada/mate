@@ -6,6 +6,8 @@ import java.util.*;
 
 import com.hp.hpl.jena.rdf.model.*;
 
+import static board.Whiteboard.writeToString;
+
 public class LoggingClient implements Client {
   private static Logger logger = LoggerFactory.getLogger (LoggingClient.class);
 
@@ -15,7 +17,8 @@ public class LoggingClient implements Client {
 
   public void postUpdate (Board board, Model model) {
     logger.info ("got an update");
-    // model.write (System.out, "N3");
+    logger.trace (writeToString (model));
+    logger.trace ("---");
   }
 
   public void run () {

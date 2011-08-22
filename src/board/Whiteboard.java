@@ -416,16 +416,17 @@ public class Whiteboard implements Board, Runnable {
 
     postGenericUpdate (mateOntology, poster, model, false);
 
-    // System.out.println ("world values are now");
-    // worldModel.write (System.out, "N3");
-    // System.out.println ("---");
+    logger.trace ("world values =");
+    logger.trace (writeToString (worldModel));
+    logger.trace ("---");
 
-    // System.out.println ("private values are now");
-    // for (Client client : clients) {
-    //   System.out.println ("Client " + client.getName () + ", <" + client + ">:");
-    //   getPrivateModel (client).write (System.out, "N3");
-    //   System.out.println ("---");
-    // }
+    logger.trace ("private values =");
+    for (Client client : clients) {
+      logger.trace ("Client " + client.getName () + ", <" + client + ">:");
+      logger.trace (writeToString (getPrivateModel (client)));
+      logger.trace ("---");
+    }
+    logger.trace ("===");
   }
 
   public void postSensorUpdate (Client poster, Model model) {
@@ -439,9 +440,9 @@ public class Whiteboard implements Board, Runnable {
 
     postGenericUpdate (sensorOntology, poster, model, true);
 
-    // System.out.println ("sensor values are now");
-    // sensorValues.write (System.out, "N3");
-    // System.out.println ("---");
+    logger.trace ("sensor values =");
+    logger.trace (writeToString (sensorValues));
+    logger.trace ("---");
   }
 
   /**
@@ -673,9 +674,9 @@ public class Whiteboard implements Board, Runnable {
       exec.close ();
     }
 
-    // System.out.println ("history values are = ---");
-    // historyValues.write (System.out, "N3");
-    // System.out.println ("\n---");
+    logger.trace ("history values =");
+    logger.trace (writeToString (historyValues));
+    logger.trace ("---");
   }
 
   /**
@@ -707,11 +708,21 @@ public class Whiteboard implements Board, Runnable {
       while (results.hasNext ()) {
     	QuerySolution solution = results.next ();
 
-	logger.debug ("solution " + solution);
+	logger.trace ("solution " + solution);
       }
     }
     finally {
       exec.close ();
     }
+  }
+
+  public static String writeToString (Model model) {
+    return writeToString (model, "N3");
+  }
+
+  public static String writeToString (Model model, String language) {
+    StringWriter writer = new StringWriter ();
+    model.write (writer, language);
+    return writer.toString ();
   }
 }

@@ -5,10 +5,10 @@ if [ -z $MAIN ]; then
 fi
 
 if [ -z $LOGGING ]; then
-  LOGGING=simple
+  LOGGING=log4j
 fi
 
 LIBS=$(echo $LIBS lib/*.jar | tr ' ' ':')
 LOG=$(echo lib/slf4j/slf4j-$LOGGING*.jar)
 
-java -cp bin:src:$LIBS:$LOG $MAIN "$*"
+java -Dlog4j.configuration=log4j.properties -cp .:bin:src:$LIBS:$LOG $MAIN "$*"

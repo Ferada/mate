@@ -44,8 +44,8 @@ public class MateClass {
   public String toString () {
     String label = base.getLabel (null);
     if (label == null)
-      return "MateClass@<" + base.getLocalName () + ">";
+      return "MateClass<" + base.getLocalName () + ">";
     else
-      return "MateClass@<" + label + ">";
+      return "MateClass<" + label + ">";
   }
 }

@@ -6,6 +6,8 @@ import java.util.*;
 
 import com.hp.hpl.jena.rdf.model.*;
 
+import static board.Whiteboard.writeToString;
+
 public class LoggingReasoner implements Reasoner {
   private static Logger logger = LoggerFactory.getLogger (LoggingReasoner.class);
 
@@ -15,13 +17,17 @@ public class LoggingReasoner implements Reasoner {
 
   public void postUpdate (Board board, Model model) {
     logger.info ("got an update");
-    // model.write (System.out, "N3");
+    logger.trace (writeToString (model));
+    logger.trace ("---");
   }
 
   public void postTrainingUpdate (Model training, Model result) {
     logger.info ("got a training update");
-    // training.write (System.out, "N3");
-    // result.write (System.out, "N3");
+    logger.trace ("training");
+    logger.trace (writeToString (training));
+    logger.trace ("result");
+    logger.trace (writeToString (result));
+    logger.trace ("---");
   }
 
   public void run () {
