@@ -10,7 +10,8 @@ import java.util.*;
 public interface Combiner {
   /**
    * Produces a single model from the various private client-side
-   * models.
+   * models.  May change the resulting object type though.  Restricting
+   * the result to one object isn't enforced at the moment.
    */
   public Model combine (Board board, Client poster, Model model, Resource type, Resource marker, MateClass klass);
 }

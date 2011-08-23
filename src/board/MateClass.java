@@ -9,6 +9,10 @@ import java.util.*;
 
 import board.vocabulary.*;
 
+/**
+ * Contains information (at the moment only the primary key) about RDF
+ * classes in the Mate namespace.
+ */
 public class MateClass {
   private static Logger logger = LoggerFactory.getLogger (MateClass.class);
 

@@ -27,12 +27,10 @@ import java.util.concurrent.*;
 import board.vocabulary.*;
 
 /**
- * May be run within a thread.
+ * The main class implementing all the behaviour of a typical
+ * {@link Board}.  May be run within a thread.
  */
 public class Whiteboard implements Board, Runnable {
-  /**
-   *
-   */
   private static Logger logger = LoggerFactory.getLogger (Whiteboard.class);
 
   /**
@@ -41,7 +39,7 @@ public class Whiteboard implements Board, Runnable {
   public Model worldModel;
 
   /**
-   *
+   * Write access to the {@link #worldModel}.
    */
   private GraphStore worldStore;
 
@@ -51,7 +49,7 @@ public class Whiteboard implements Board, Runnable {
   public Model sensorValues;
 
   /**
-   *
+   * Write access to the {@link #sensorValues}.
    */
   private GraphStore sensorStore;
 
@@ -61,7 +59,7 @@ public class Whiteboard implements Board, Runnable {
   public Model historyValues;
 
   /**
-   *
+   * Write access to the {@link #historyValues}.
    */
   private GraphStore historyStore;
 
@@ -77,7 +75,7 @@ public class Whiteboard implements Board, Runnable {
 
   /**
    * Default prefixes for convenience and smaller text.
-   * @see ModelFactory.getDefaultModelPrefixes
+   * @see ModelFactory#getDefaultModelPrefixes
    */
   public PrefixMapping prefixes;
 
@@ -92,12 +90,12 @@ public class Whiteboard implements Board, Runnable {
   public Map<Client, Model> privateModels;
 
   /**
-   *
+   * Write access for each model in {@link #privateModels}.
    */
   public Map<Client, GraphStore> privateStores;
 
   /**
-   *
+   * Registered set of combiners, indexed by the RDF type URI.
    */
   private Map<String, Combiner> combiners;
 
@@ -106,7 +104,8 @@ public class Whiteboard implements Board, Runnable {
   }
 
   /**
-   * Resets the board to a known (clean/empty?) state.
+   * Resets the board to a known (clean/empty?) state.  May fail if
+   * ontology or example files were not found.
    */
   public void reset () throws FileNotFoundException {
     prefixes = PrefixMapping.Factory.create ();
@@ -193,7 +192,8 @@ public class Whiteboard implements Board, Runnable {
 
   /**
    * Loads an RDF file into a newly created default model.
-   * @see loadRdf, ModelFactory.createDefaultModel
+   * @see #loadRdf(String, String, Model)
+   * @see ModelFactory#createDefaultModel
    */
   public static Model loadRdf (String pathname, String lang) throws FileNotFoundException {
     return loadRdf (pathname, lang, ModelFactory.createDefaultModel ());
@@ -201,7 +201,8 @@ public class Whiteboard implements Board, Runnable {
 
   /**
    * Loads an OWL ontology into a newly created default model.
-   * @see loadRdf, ModelFactory.createOntologyModel
+   * @see #loadRdf(String, String)
+   * @see ModelFactory#createOntologyModel
    */
   public static MateOntology loadOntology (String pathname, String lang) throws FileNotFoundException {
     return new MateOntology (loadRdf (pathname, lang, ModelFactory.createDefaultModel()));
@@ -240,7 +241,20 @@ public class Whiteboard implements Board, Runnable {
     board.postWorldUpdate (client, sample3);
     board.postWorldUpdate (reasoner, sample4);
 
-    board.query (QueryFactory.read ("file:query1.sparql"));
+    Query query = QueryFactory.read ("file:query1.sparql");
+    QueryExecution exec = board.query (query);
+    logger.info ("running query " + query);
+    try {
+      ResultSet results = exec.execSelect ();
+      while (results.hasNext ()) {
+    	QuerySolution solution = results.next ();
+
+	logger.trace ("solution " + solution);
+      }
+    }
+    finally {
+      exec.close ();
+    }
 
     thread.join ();
   }
@@ -366,9 +380,7 @@ public class Whiteboard implements Board, Runnable {
       group.addTriplePattern (triple);
   }
 
-  /**
-   */
-  public List<Model> matching (Model test, Resource type, Resource marker, MateClass klass) {
+  public List<Model> matching (Model test, Resource marker, MateClass klass) {
     List<Model> result = new ArrayList<Model> ();
 
     final String queryString = "SELECT ?marker WHERE {}";
@@ -384,11 +396,12 @@ public class Whiteboard implements Board, Runnable {
     Var var_marker = Var.alloc ("marker");
 
     PathBlock pattern = block.getPattern ();
+    Resource type = klass.base.asResource ();
     pattern.add (new TriplePath (new Triple (var_marker, RDF.Nodes.type, type.asNode ())));
 
     addPrimaryKeyChecks (Var.alloc ("marker"), marker, klass, pattern);
 
-    logger.debug ("matching query = \n" + query + "\n---");
+    logger.trace ("matching query = " + query);
 
     /* construct query according to schema */
     for (Model model : privateModels.values ()) {
@@ -515,7 +528,7 @@ public class Whiteboard implements Board, Runnable {
 	//   insertPattern.addTriple (it.nextStatement ().asTriple ());
 	// }
 
-	logger.debug ((recursive ? "recursive" : "nonrecursive") + " deleteRequest " + deleteRequest);
+	logger.trace ((recursive ? "recursive" : "nonrecursive") + " deleteRequest " + deleteRequest);
 
 	/* get the closure, i.e. reachable statements */
 	Model closure = Closure.closure (markerResource, true);
@@ -613,7 +626,7 @@ public class Whiteboard implements Board, Runnable {
     pattern.add (new TriplePath (new Triple (var_entry, Node.createURI (Mate.historyType.getURI ()), typeResource.asNode ())));
     addPrimaryKeyChecks (var_entry, markerResource, klass, pattern);
 
-    logger.debug ("matching query = " + query);
+    logger.trace ("matching query = " + query);
 
     /* construct query according to schema */
 
@@ -626,7 +639,7 @@ public class Whiteboard implements Board, Runnable {
 	QuerySolution solution = results.next ();
 	entry = solution.get ("entry").asResource ();
 
-	logger.debug ("entry = " + entry);
+	logger.trace ("entry = " + entry);
 
 	Statement entries = entry.getProperty (Mate.historyEntries);
 	list = entries.getObject ().asResource ();
@@ -689,41 +702,27 @@ public class Whiteboard implements Board, Runnable {
     logger.trace ("---");
   }
 
-  /**
-   * Should somehow query the database.  This is complicated since
-   * SPARQL supports more than one kind of query and therefore requires
-   * more than one result type.
-   */
-  public void query (Query query) {
+  public QueryExecution query (Query query) {
     /* default graph goes over the union of these graphs */
     Graph graphs[] = {worldModel.getGraph (), sensorValues.getGraph (), historyValues.getGraph ()};
     MultiUnion union = new MultiUnion (graphs);
+    /* but updates only go to world */
     union.setBaseGraph (graphs[0]);
 
     /* wrong, because it would return a new independent model */
     // Model union = worldModel.union (sensorValues).union (historyValues);
 
     DataSource source = DatasetFactory.create ();
-    // source.setDefaultModel (union);
     source.setDefaultModel (ModelFactory.createModelForGraph (union));
     source.addNamedModel ("http://www.imis.uni-luebeck.de/mate/graphs#world", worldModel);
     source.addNamedModel ("http://www.imis.uni-luebeck.de/mate/graphs#sensor", sensorValues);
     source.addNamedModel ("http://www.imis.uni-luebeck.de/mate/graphs#history", historyValues);
 
-    logger.debug ("executing " + query);
+    return QueryExecutionFactory.create (query, source);
+  }
 
-    QueryExecution exec = QueryExecutionFactory.create (query, source);
-    try {
-      ResultSet results = exec.execSelect ();
-      while (results.hasNext ()) {
-    	QuerySolution solution = results.next ();
-
-	logger.trace ("solution " + solution);
-      }
-    }
-    finally {
-      exec.close ();
-    }
+  public QueryExecution query (String query) {
+    return query (QueryFactory.create (query));
   }
 
   public static String writeToString (Model model) {

@@ -12,6 +12,12 @@ import board.vocabulary.*;
 
 import static board.Whiteboard.writeToString;
 
+/**
+ * Example combiner which logs every event, returns only the first model
+ * of a given set and changes the result type from
+ * <code>AvailabilityResult</code> to <code>AvailabilityResultMod</code>
+ * for testing purposes.
+ */
 public class LoggingCombiner extends CombinerBase {
   private static Logger logger = LoggerFactory.getLogger (LoggingCombiner.class);
 
@@ -24,7 +30,7 @@ public class LoggingCombiner extends CombinerBase {
     }
     logger.trace ("===");
     Model result = models.get (0);
-    if (type.getURI ().equals (Mate.resource ("AvailabilityResult"))) {
+    if (type.equals (Mate.resource ("AvailabilityResult"))) {
       logger.info ("changing type to AvailibilityResultMod though");
       Statement st = result.getProperty (null, RDF.type);
       st.changeObject (Mate.resource ("AvailabilityResultMod"));

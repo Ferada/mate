@@ -2,6 +2,9 @@ package board;
 
 import com.hp.hpl.jena.rdf.model.*;
 
+/**
+ * A board client which can receive updates from a board.
+ */
 public interface Client extends Runnable {
   /**
    * Returns a name identifying this client, which may be later

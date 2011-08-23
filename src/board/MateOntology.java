@@ -19,7 +19,7 @@ public class MateOntology {
   private Map<String, MateClass> classes;
 
   /**
-   * Lookup can refer to these base ontologies if necessary.
+   * Recursive lookup can refer to these base ontologies if necessary.
    */
   private Collection<MateOntology> bases;
 
@@ -67,10 +67,23 @@ public class MateOntology {
       logger.info ("ontology class " + klass);
   }
 
+  /**
+   * Returns the {@link MateClass} with the specified URI or null if there
+   * is none available.  Uses recursive lookup.
+   * @see #getClass(String, boolean)
+   */
   public MateClass getClass (String uri) {
     return getClass (uri, true);
   }
 
+  /**
+   * Returns the {@link MateClass} with the specified URI or null if there
+   * is none available.
+   * @param recursive If true, do lookup recursively in all base ontologies
+   * if the class wasn't found in the current one.
+   * @see #addBaseOntology
+   * @see #getClass(String)
+   */
   public MateClass getClass (String uri, boolean recursive) {
     MateClass result = classes.get (uri);
     if (result != null || recursive)

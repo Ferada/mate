@@ -8,6 +8,9 @@ import com.hp.hpl.jena.rdf.model.*;
 
 import static board.Whiteboard.writeToString;
 
+/**
+ * Example reasoner which simply logs every event.
+ */
 public class LoggingReasoner implements Reasoner {
   private static Logger logger = LoggerFactory.getLogger (LoggingReasoner.class);
 

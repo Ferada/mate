@@ -8,6 +8,9 @@ import com.hp.hpl.jena.rdf.model.*;
 
 import static board.Whiteboard.writeToString;
 
+/**
+ * Example client which simply logs every event.
+ */
 public class LoggingClient implements Client {
   private static Logger logger = LoggerFactory.getLogger (LoggingClient.class);
 
