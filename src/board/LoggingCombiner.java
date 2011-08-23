@@ -6,6 +6,10 @@ import com.hp.hpl.jena.rdf.model.*;
 
 import java.util.*;
 
+import com.hp.hpl.jena.vocabulary.RDF;
+
+import board.vocabulary.*;
+
 import static board.Whiteboard.writeToString;
 
 public class LoggingCombiner extends CombinerBase {
@@ -13,12 +17,16 @@ public class LoggingCombiner extends CombinerBase {
 
   public Model combine (Board board, Client poster, Resource type, MateClass klass, List<Model> models) {
     logger.info ("combining models for type " + type.getLocalName () + ", " + models.size () + " models, choosing the first one");
+    logger.info ("changing type to AvailibilityResultMod though");
     for (Model model : models) {
       logger.trace ("model =");
       logger.trace (writeToString (model));
       logger.trace ("---");
     }
     logger.trace ("===");
-    return models.get (0);
+    Model result = models.get (0);
+    Statement st = result.getProperty (null, RDF.type);
+    st.changeObject (Mate.resource ("AvailabilityResultMod"));
+    return result;
   }
 }

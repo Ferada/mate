@@ -414,7 +414,7 @@ public class Whiteboard implements Board, Runnable {
       return;
     }
 
-    postGenericUpdate (mateOntology, poster, model, false);
+    postGenericUpdate (mateOntology, poster, model, false, false);
 
     logger.trace ("world values =");
     logger.trace (writeToString (worldModel));
@@ -438,7 +438,7 @@ public class Whiteboard implements Board, Runnable {
     if (poster instanceof Reasoner)
       logger.warn ("a reasoner probably shouldn't post sensor value updates");
 
-    postGenericUpdate (sensorOntology, poster, model, true);
+    postGenericUpdate (sensorOntology, poster, model, true, false);
 
     logger.trace ("sensor values =");
     logger.trace (writeToString (sensorValues));
@@ -449,7 +449,7 @@ public class Whiteboard implements Board, Runnable {
    * Does the boring extraction of proper values from the update model
    * in a generic way for both world and sensor updates.
    */
-  private void postGenericUpdate (MateOntology ontology, Client poster, Model model, boolean sensorUpdate) {
+  private void postGenericUpdate (MateOntology ontology, Client poster, Model model, boolean sensorUpdate, boolean recursive) {
     /* merge the posted model with the sensor values model, according to the
        defined schema; if there is no such schema, log it and continue */
 
@@ -515,26 +515,27 @@ public class Whiteboard implements Board, Runnable {
 	//   insertPattern.addTriple (it.nextStatement ().asTriple ());
 	// }
 
-	logger.debug ("deleteRequest " + deleteRequest);
-
-	UpdateProcessor deleteExec = UpdateExecutionFactory.create (deleteRequest, sensorStore);
-	deleteExec.execute ();
+	logger.debug ((recursive ? "recursive" : "nonrecursive") + "deleteRequest " + deleteRequest);
 
 	/* get the closure, i.e. reachable statements */
 	Model closure = Closure.closure (markerResource, true);
 
+	boolean result = true;
 	if (sensorUpdate)
 	  sensorUpdateInner (closure, poster, typeResource, markerResource, typeUri, klass, deleteRequest);
 	else
-	  worldUpdateInner (closure, poster, typeResource, markerResource, typeUri, klass, deleteRequest);
+	  /* this might combine stuff and handle it itself, so check the return value */
+	  result = worldUpdateInner (closure, poster, typeResource, markerResource, typeUri, klass, deleteRequest, recursive);
 
-	/* add history entry */
-	updateHistory (closure, typeResource, markerResource, klass);
+	if (result) {
+	  /* add history entry */
+	  updateHistory (closure, typeResource, markerResource, klass);
 
-	/* submit the updated sensor datum to matching clients */
-	for (Client client : clients) {
-	  // TODO: check whether this client actually wants this message
-	  client.postUpdate (this, closure);
+	  /* submit the updated sensor datum to matching clients */
+	  for (Client client : clients) {
+	    // TODO: check whether this client actually wants this message
+	    client.postUpdate (this, closure);
+	  }
 	}
       }
     }
@@ -551,6 +552,9 @@ public class Whiteboard implements Board, Runnable {
   private void sensorUpdateInner (Model closure, Client poster, Resource typeResource,
 				 Resource markerResource, String typeUri, MateClass klass,
 				 UpdateRequest deleteRequest) {
+    UpdateProcessor deleteExec = UpdateExecutionFactory.create (deleteRequest, sensorStore);
+    deleteExec.execute ();
+
     /* insert the updated values into global database */
     sensorValues.add (closure);
   }
@@ -563,23 +567,29 @@ public class Whiteboard implements Board, Runnable {
    * since previous values are only removed if they matched with the
    * deleteRequest, used in postGenericUpdate.
    */
-  private void worldUpdateInner (Model closure, Client poster, Resource typeResource,
-				 Resource markerResource, String typeUri, MateClass klass,
-				 UpdateRequest deleteRequest) {
-    /* insert the updated values into the private database */
-    getPrivateModel (poster).add (closure);
+  private boolean worldUpdateInner (Model closure, Client poster, Resource typeResource,
+				    Resource markerResource, String typeUri, MateClass klass,
+				    UpdateRequest deleteRequest, boolean recursive) {
+    if (!recursive) {
+      /* insert the updated values into the private database */
+      getPrivateModel (poster).add (closure);
 
-    /* propagate inserted values from the private models into the public world model */
-    Combiner combiner = getCombiner (typeUri);
-    if (combiner != null) {
-      /* if we have a custom module to decide this, execute it here */
-      closure = combiner.combine (this, poster, closure, typeResource, markerResource, klass);
+      /* propagate inserted values from the private models into the public world model */
+      Combiner combiner = getCombiner (typeUri);
+      if (combiner != null) {
+	/* if we have a custom module to decide this, execute it here */
+	Model result = combiner.combine (this, poster, closure, typeResource, markerResource, klass);
+	postGenericUpdate (mateOntology, poster, result, false, true);
+	return false;
+      }
     }
+
     /* else just override with the current values */
     /* TODO: can we share this somehow? */
     UpdateProcessor deleteExec = UpdateExecutionFactory.create (deleteRequest, worldStore);
     deleteExec.execute ();
     worldModel.add (closure);
+    return true;
   }
 
   /**

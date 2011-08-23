@@ -28,3 +28,9 @@
 
 (defun load-ontology (pathname &optional (language "RDF/XML"))
   (jstatic "loadOntology" "board.Whiteboard" pathname language))
+
+(defun make-resource (uriref)
+  (jstatic "createResource" "com.hp.hpl.jena.rdf.model.ResourceFactory" uriref))
+
+(defun get-local-name (resource)
+  (jcall (jmethod "com.hp.hpl.jena.rdf.model.Resource" "getLocalName") resource))
