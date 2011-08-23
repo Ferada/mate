@@ -515,7 +515,7 @@ public class Whiteboard implements Board, Runnable {
 	//   insertPattern.addTriple (it.nextStatement ().asTriple ());
 	// }
 
-	logger.debug ((recursive ? "recursive" : "nonrecursive") + "deleteRequest " + deleteRequest);
+	logger.debug ((recursive ? "recursive" : "nonrecursive") + " deleteRequest " + deleteRequest);
 
 	/* get the closure, i.e. reachable statements */
 	Model closure = Closure.closure (markerResource, true);

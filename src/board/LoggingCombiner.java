@@ -17,7 +17,6 @@ public class LoggingCombiner extends CombinerBase {
 
   public Model combine (Board board, Client poster, Resource type, MateClass klass, List<Model> models) {
     logger.info ("combining models for type " + type.getLocalName () + ", " + models.size () + " models, choosing the first one");
-    logger.info ("changing type to AvailibilityResultMod though");
     for (Model model : models) {
       logger.trace ("model =");
       logger.trace (writeToString (model));
@@ -25,8 +24,11 @@ public class LoggingCombiner extends CombinerBase {
     }
     logger.trace ("===");
     Model result = models.get (0);
-    Statement st = result.getProperty (null, RDF.type);
-    st.changeObject (Mate.resource ("AvailabilityResultMod"));
+    if (type.getURI ().equals (Mate.resource ("AvailabilityResult"))) {
+      logger.info ("changing type to AvailibilityResultMod though");
+      Statement st = result.getProperty (null, RDF.type);
+      st.changeObject (Mate.resource ("AvailabilityResultMod"));
+    }
     return result;
   }
 }
