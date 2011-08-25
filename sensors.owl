@@ -4,6 +4,7 @@
 <!DOCTYPE rdf:RDF [
     <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
     <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY sensors "http://www.imis.uni-luebeck.de/mate/sensors#" >
     <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
     <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
 ]>
@@ -46,8 +47,8 @@
 
     <!-- http://www.imis.uni-luebeck.de/mate/sensors#available -->
 
-    <owl:DatatypeProperty rdf:about="http://www.imis.uni-luebeck.de/mate/sensors#available">
-        <rdfs:domain rdf:resource="http://www.imis.uni-luebeck.de/mate/sensors#AvailabilitySensorValue"/>
+    <owl:DatatypeProperty rdf:about="&sensors;available">
+        <rdfs:domain rdf:resource="&sensors;AvailabilitySensorValue"/>
         <rdfs:range rdf:resource="&xsd;boolean"/>
     </owl:DatatypeProperty>
     
@@ -55,8 +56,8 @@
 
     <!-- http://www.imis.uni-luebeck.de/mate/sensors#jid -->
 
-    <owl:DatatypeProperty rdf:about="http://www.imis.uni-luebeck.de/mate/sensors#jid">
-        <rdfs:domain rdf:resource="http://www.imis.uni-luebeck.de/mate/sensors#AvailabilitySensorValue"/>
+    <owl:DatatypeProperty rdf:about="&sensors;jid">
+        <rdfs:domain rdf:resource="&sensors;AvailabilitySensorValue"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -75,20 +76,20 @@
 
     <!-- http://www.imis.uni-luebeck.de/mate/sensors#AvailabilitySensorValue -->
 
-    <owl:Class rdf:about="http://www.imis.uni-luebeck.de/mate/sensors#AvailabilitySensorValue">
+    <owl:Class rdf:about="&sensors;AvailabilitySensorValue">
         <rdfs:isDefinedBy rdf:resource="http://www.imis.uni-luebeck.de/mate/sensors"/>
-	<mate:primaryKey rdf:resource="http://www.imis.uni-luebeck.de/mate/sensors#AvailabilityKey"/>
+	<mate:primaryKey rdf:resource="&sensors;AvailabilityKey"/>
     </owl:Class>
 
     <mate:PrimaryKey rdf:ID="AvailabilityKey">
-        <rdf:first rdf:resource="http://www.imis.uni-luebeck.de/mate/sensors#jid"/>
+        <rdf:first rdf:resource="&sensors;jid"/>
 	<rdf:rest rdf:resource="&rdf;nil"/>
     </mate:PrimaryKey>
 
 
     <!-- http://www.imis.uni-luebeck.de/mate/sensors#Sensor -->
 
-    <owl:Class rdf:about="http://www.imis.uni-luebeck.de/mate/sensors#Sensor"/>
+    <owl:Class rdf:about="&sensors;Sensor"/>
 </rdf:RDF>
 
 

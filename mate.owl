@@ -57,7 +57,7 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
-    <owl:DatatypeProperty rdf:about="http://www.imis.uni-luebeck.de/mate#available">
+    <owl:DatatypeProperty rdf:about="&mate;available">
         <rdfs:domain>
 	    <owl:Class>
 	        <owl:unionOf rdf:parseType="Collection">
@@ -71,7 +71,7 @@
     </owl:DatatypeProperty>
     
 
-    <owl:DatatypeProperty rdf:about="http://www.imis.uni-luebeck.de/mate#jid">
+    <owl:DatatypeProperty rdf:about="&mate;jid">
         <rdfs:domain>
 	    <owl:Class>
 	        <owl:unionOf rdf:parseType="Collection">
@@ -94,13 +94,13 @@
      -->
 
     
-    <owl:ObjectProperty rdf:about="http://www.imis.uni-luebeck.de/mate#historyType">
-	<rdfs:domain rdf:resource="http://www.imis.uni-luebeck.de/mate#HistoryEntry"/>
+    <owl:ObjectProperty rdf:about="&mate;historyType">
+	<rdfs:domain rdf:resource="&mate;HistoryEntry"/>
         <rdfs:range rdf:resource="&owl;Class"/>
     </owl:ObjectProperty>
 
-    <owl:ObjectProperty rdf:about="http://www.imis.uni-luebeck.de/mate#historyEntries">
-	<rdfs:domain rdf:resource="http://www.imis.uni-luebeck.de/mate#HistoryEntry"/>
+    <owl:ObjectProperty rdf:about="&mate;historyEntries">
+	<rdfs:domain rdf:resource="&mate;HistoryEntry"/>
         <rdfs:range rdf:resource="&rdf;List"/>
     </owl:ObjectProperty>
 
@@ -126,11 +126,11 @@
     <!-- http://www.imis.uni-luebeck.de/mate#AvailabilityResult -->
 
     <owl:Class rdf:about="&mate;AvailabilityResult">
-      <primaryKey rdf:resource="http://www.imis.uni-luebeck.de/mate#AvailabilityKey"/>
+      <primaryKey rdf:resource="&mate;AvailabilityKey"/>
     </owl:Class>
     
     <PrimaryKey rdf:ID="AvailabilityKey">
-        <rdf:first rdf:resource="http://www.imis.uni-luebeck.de/mate#jid"/>
+        <rdf:first rdf:resource="&mate;jid"/>
 	<rdf:rest rdf:resource="&rdf;nil"/>
     </PrimaryKey>
 
@@ -138,11 +138,11 @@
     <!-- just a test class -->
 
     <owl:Class rdf:about="&mate;AvailabilityResultMod">
-      <primaryKey rdf:resource="http://www.imis.uni-luebeck.de/mate#AvailabilityModKey"/>
+      <primaryKey rdf:resource="&mate;AvailabilityModKey"/>
     </owl:Class>
     
     <PrimaryKey rdf:ID="AvailabilityModKey">
-        <rdf:first rdf:resource="http://www.imis.uni-luebeck.de/mate#jid"/>
+        <rdf:first rdf:resource="&mate;jid"/>
 	<rdf:rest rdf:resource="&rdf;nil"/>
     </PrimaryKey>
 
