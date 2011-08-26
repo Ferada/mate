@@ -1,6 +1,15 @@
 package hub;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+
+import java.util.Properties;
+
+import static java.util.Arrays.asList;
+
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
@@ -43,47 +52,14 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 	
 	private			boolean	run = true;
 	
-	
-	/**
-	 * Startet den AwarenessHub mit den Parametern Host, Username und Passwort.
-	 * 
-	 * @param args Kommandozeilenparameter in der Reihenfolge der
-	 * 				Attribute in AwarenessHub(...)
-	 */
-	public AwarenessHub(String host, String username, String password) {
-		this(host,username,password,host,username,password,DBNAME);	
-	}
-	
-	/**
-	 * Startet den AwarenessHub mit den Parametern Host, Username, Passwort und DB-Name.
-	 * 
-	 * @param args Kommandozeilenparameter in der Reihenfolge der
-	 * 				Attribute in AwarenessHub(...)
-	 */
-	public AwarenessHub(String host, String username, String password, String dbName) {
-		this(host,username,password,host,username,password,dbName);	
-	}
-	
-	/**
-	 * Startet den AwarenessHub mit den Parametern Host, Username, Passwort, SQL-Server,
-	 * DB-Username und DB-Passwort.
-	 * 
-	 * @param args Kommandozeilenparameter in der Reihenfolge der
-	 * 				Attribute in AwarenessHub(...)
-	 */
-	public AwarenessHub(String host, String username, String password,
-						String dbHost, String dbUsername, String dbPassword) {
-		this(host,username,password,dbHost,dbUsername,dbPassword,DBNAME);
-	}
-	
 	/**
 	 * Erzeugt eine AwarenessHub-Instanz, loggt sich als JabberClient ein,
 	 * initialisert benötigte Ressourcen und verweilt dann in einer Endlosschleife,
 	 * bis das Attribut run auf false gesetzt wird, danach wird die Verbindung abgebrochen.
 	 */
 	public AwarenessHub(String host, String username, String password,
-						String dbHost, String dbUsername, String dbPassword,
-						String dbName) {
+			    String jdbcDriver, String dbUrl, String dbUsername, String dbPassword,
+			    boolean receiveSMS, boolean receiveMail) {
 		// Logindaten initialisieren
 		server		= host;
 		hubName		= username;
@@ -94,8 +70,8 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 		connection.addMateListener(this);
 		
 		// Ressourcen initialisieren
-		dataManager		= DatabaseDataManager.createDataManager(dbHost,dbUsername,dbPassword,dbName);
-		generator 		= new Generator(new SMSGateway(), new MailGateway(), connection);
+		dataManager		= DatabaseDataManager.createDataManager(jdbcDriver,dbUrl,dbUsername,dbPassword);
+		generator 		= new Generator(new SMSGateway(receiveSMS), new MailGateway(receiveMail), connection);
 		contextAnalyzer = new ContextAnalyzer(fileTransferManager, dataManager);
 		syntaxAnalyzer 	= new SyntaxAnalyzer();
 		
@@ -180,21 +156,73 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 	 * @param args Kommandozeilenparameter in der Reihenfolge der
 	 * 				Attribute in AwarenessHub(...)
 	 */
-	public static void main(String[] args) {
-		if(args.length < 3) {
-			System.out.println(
-					"Usage: java -jar MATeHub.jar " +
-					"<XMPP-Server> <hubUsername> <hubPassword> [<MySQL-Server> <DBUsername> <DBPassword>] [<DBName>]"
-			);
-		} else if(args.length < 4) {
-			new AwarenessHub(args[0],args[1],args[2]);
-		} else if(args.length < 6) {
-			new AwarenessHub(args[0],args[1],args[2],args[3]);
-		} else if(args.length < 7) {
-			new AwarenessHub(args[0],args[1],args[2],args[3],args[4],args[5]);
-		} else {
-			new AwarenessHub(args[0],args[1],args[2],args[3],args[4],args[5],args[6]);
-		}
+	public static void main(String[] args) throws Exception {
+	  OptionParser parser = new OptionParser () {
+	      {
+		acceptsAll (asList ("h", "?", "help"), "display this help and exit");
+		acceptsAll (asList ("V", "version"), "output version information and exit");
+		acceptsAll (asList ("v", "verbose"), "be more verbose")
+		  .withOptionalArg ().ofType (String.class).defaultsTo ("debug");
+		acceptsAll (asList ("c", "conf"), "configuration file")
+		  .withRequiredArg ().ofType (String.class).defaultsTo ("config.xml");
+		
+		acceptsAll (asList ("xmpp.server"), "XMPP server name")
+		  .withRequiredArg ().ofType (String.class).defaultsTo ("localhost");
+		acceptsAll (asList ("xmpp.username"), "XMPP user name")
+		  .withRequiredArg ().ofType (String.class).defaultsTo ("mate");
+		acceptsAll (asList ("xmpp.password"), "XMPP password")
+		  .withRequiredArg ().ofType (String.class).defaultsTo ("password");
+		acceptsAll (asList ("jdbc.driver"), "database driver")
+		  .withRequiredArg ().ofType (String.class).defaultsTo ("com.mysql.jdbc.Driver");
+		acceptsAll (asList ("jdbc.url"), "database connection")
+		  .withRequiredArg ().ofType (String.class).defaultsTo ("jdbc:mysql://localhost/mate");
+		acceptsAll (asList ("jdbc.username"), "database user")
+		  .withRequiredArg ().ofType (String.class).defaultsTo ("mate");
+		acceptsAll (asList ("jdbc.password"), "database password")
+		  .withRequiredArg ().ofType (String.class).defaultsTo ("password");
+		/* TODO: this should be mail reception and sending as well as for sms */
+		acceptsAll (asList ("mail"), "enable mail reception")
+			.withOptionalArg ().ofType (Boolean.class).defaultsTo (Boolean.FALSE);
+		acceptsAll (asList ("sms"), "enable sms reception")
+			.withOptionalArg ().ofType (Boolean.class).defaultsTo (Boolean.FALSE);
+	      }
+	    };
+
+	  OptionSet options = parser.parse (args);
+	  if (options.has ("h")) {
+	    System.out.println ("Usage: hub.AwarenessHub [OPTION]...");
+	    parser.printHelpOn (System.out);
+	    return;
+	  }
+	  if (options.has ("V")) {
+	    System.out.println ("MATe Awarenesshub (c) 2011");
+	    return;
+	  }
+
+	  String xmppServer = (String) options.valueOf ("xmpp.server");
+	  String xmppUsername = (String) options.valueOf ("xmpp.username");
+	  String xmppPassword = (String) options.valueOf ("xmpp.password");
+
+	  String jdbcDriver = (String) options.valueOf ("jdbc.driver");
+	  String jdbcUrl = (String) options.valueOf ("jdbc.url");
+	  String jdbcUsername = (String) options.valueOf ("jdbc.username");
+	  String jdbcPassword = (String) options.valueOf ("jdbc.password");
+
+	  Boolean receiveSms = (Boolean) options.valueOf ("sms");
+	  Boolean receiveMail = (Boolean) options.valueOf ("mail");
+
+	  System.out.println ("xmpp.server = \"" + xmppServer + "\"");
+	  System.out.println ("xmpp.username = \"" + xmppUsername + "\"");
+	  System.out.println ("xmpp.password = \"" + xmppPassword + "\"");
+
+	  System.out.println ("jdbc.driver = \"" + jdbcDriver + "\"");
+	  System.out.println ("jdbc.url = \"" + jdbcUrl + "\"");
+	  System.out.println ("jdbc.username = \"" + jdbcUsername + "\"");
+	  System.out.println ("jdbc.password = \"" + jdbcPassword + "\"");
+
+	  AwarenessHub hub = new AwarenessHub (xmppServer, xmppUsername, xmppPassword,
+					       jdbcDriver, jdbcUrl, jdbcUsername, jdbcPassword,
+					       receiveSms, receiveMail);
 	}
 
 

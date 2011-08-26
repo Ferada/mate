@@ -75,9 +75,9 @@ public class SMSGateway extends Thread {
 	/**
 	 * Erzeugt ein Standard-SMSGateway.
 	 */
-	public SMSGateway() {
+	public SMSGateway(boolean receiveSMS) {
 		listeners = new ArrayList<SMSListener>();
-		setReceiveSMS(true);
+		setReceiveSMS(receiveSMS);
 	}
 	
 	

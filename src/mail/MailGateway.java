@@ -50,13 +50,13 @@ public class MailGateway extends Thread {
 	 * True, falls im Moment ein Thread läuft. False sonst.
 	 */
 	private boolean run;
-	
+
 	/**
 	 * Erzeugt ein MailGateway.
 	 */
-	public MailGateway() {
+	public MailGateway(boolean receiveMail) {
 		listeners = new ArrayList<MailListener>();
-		setReceiveMail(true);
+		setReceiveMail(receiveMail);
 	}
 	
 	
