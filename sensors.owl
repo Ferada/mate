@@ -19,6 +19,8 @@
      xmlns:mate="http://www.imis.uni-luebeck.de/mate#">
     <owl:Ontology rdf:about="http://www.imis.uni-luebeck.de/mate/sensors">
         <owl:imports rdf:resource="http://www.imis.uni-luebeck.de/mate"/>
+	<rdfs:label xml:lang="en">MATe Sensors Ontology</rdfs:label>
+	<rdfs:label xml:lang="de">MATe Sensor Ontologie</rdfs:label>
     </owl:Ontology>
     
 
@@ -50,6 +52,8 @@
     <owl:DatatypeProperty rdf:about="&sensors;available">
         <rdfs:domain rdf:resource="&sensors;AvailabilitySensorValue"/>
         <rdfs:range rdf:resource="&xsd;boolean"/>
+	<rdfs:label xml:lang="en">available</rdfs:label>
+	<rdfs:label xml:lang="de">verfügbar</rdfs:label>
     </owl:DatatypeProperty>
     
 
@@ -59,6 +63,7 @@
     <owl:DatatypeProperty rdf:about="&sensors;jid">
         <rdfs:domain rdf:resource="&sensors;AvailabilitySensorValue"/>
         <rdfs:range rdf:resource="&xsd;string"/>
+	<rdfs:label>Jabber ID</rdfs:label>
     </owl:DatatypeProperty>
     
 
@@ -77,8 +82,9 @@
     <!-- http://www.imis.uni-luebeck.de/mate/sensors#AvailabilitySensorValue -->
 
     <owl:Class rdf:about="&sensors;AvailabilitySensorValue">
-        <rdfs:isDefinedBy rdf:resource="http://www.imis.uni-luebeck.de/mate/sensors"/>
 	<mate:primaryKey rdf:resource="&sensors;AvailabilityKey"/>
+	<rdfs:label xml:lang="en">Availability Sensor Value</rdfs:label>
+	<rdfs:label xml:lang="de">Verfügbarkeitssensorwert</rdfs:label>
     </owl:Class>
 
     <mate:PrimaryKey rdf:ID="AvailabilityKey">
@@ -89,7 +95,9 @@
 
     <!-- http://www.imis.uni-luebeck.de/mate/sensors#Sensor -->
 
-    <owl:Class rdf:about="&sensors;Sensor"/>
+    <owl:Class rdf:about="&sensors;Sensor">
+        <rdfs:label>Sensor</rdfs:label>
+    </owl:Class>
 </rdf:RDF>
 
 

@@ -16,7 +16,7 @@ public class MateOntology {
 
   public OntModel model;
 
-  private Map<String, MateClass> classes;
+  public Map<String, MateClass> classes;
 
   /**
    * Recursive lookup can refer to these base ontologies if necessary.

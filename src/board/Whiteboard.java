@@ -20,6 +20,9 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.XSD;
 import com.hp.hpl.jena.vocabulary.OWL;
 
+import java.net.*;
+import com.sun.net.httpserver.*;
+
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -257,6 +260,21 @@ public class Whiteboard implements Board, Runnable {
     }
 
     thread.join ();
+
+    int port = 8000;
+    InetSocketAddress addr = new InetSocketAddress (port);
+    HttpServer server = HttpServer.create (addr, 0);
+
+    server.createContext ("/", new IndexHandler (board));
+    server.createContext ("/mate", new OntologyHandler (board.mateOntology));
+    server.createContext ("/mate/sensors", new OntologyHandler (board.sensorOntology));
+    server.createContext ("/world", new ModelHandler (board.worldModel));
+    server.createContext ("/sensors", new ModelHandler (board.sensorValues));
+    server.createContext ("/history", new ModelHandler (board.historyValues));
+    server.setExecutor (Executors.newCachedThreadPool());
+    server.start ();
+
+    logger.info ("Server is listening on port " + port);
   }
 
   public void registerClient (Client client) {

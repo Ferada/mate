@@ -21,6 +21,8 @@
      xmlns:mate="http://www.imis.uni-luebeck.de/mate#">
     <owl:Ontology rdf:about="http://www.imis.uni-luebeck.de/mate">
         <owl:imports rdf:resource="http://xmlns.com/foaf/0.1/"/>
+	<rdfs:label xml:lang="en">MATe Ontology</rdfs:label>
+	<rdfs:label xml:lang="de">MATe Ontologie</rdfs:label>
     </owl:Ontology>
     
 
@@ -34,8 +36,14 @@
      -->
 
     <owl:AnnotationProperty rdf:about="&mate;primaryKey">
-        <rdfs:comment xml:lang="en">Defines one of the primary keys of the given class. This is used by the MATe Whiteboard implementation for example to merge new sensor values into the database and create histories on them.</rdfs:comment>
-        <rdfs:comment xml:lang="de">Definiert einen Primärschlüssel der angegebenen Klasse. Diese Funktion wird von der MATe Whiteboard-Implementierung benutzt um beispielsweise Sensordaten in die Datenbank zu speichern und Histories darüber anzulegen.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Defines one of the primary keys of the
+	given class.  This is used by the MATe Whiteboard implementation
+	for example to merge new sensor values into the database and
+	create histories on them.</rdfs:comment>
+        <rdfs:comment xml:lang="de">Definiert einen Primärschlüssel der
+	angegebenen Klasse.  Diese Funktion wird von der MATe
+	Whiteboard-Implementierung benutzt um beispielsweise Sensordaten
+	in die Datenbank zu speichern und Histories darüber anzulegen.</rdfs:comment>
     </owl:AnnotationProperty>
     
 
@@ -68,6 +76,8 @@
 	    </owl:Class>
 	</rdfs:domain>
         <rdfs:range rdf:resource="&xsd;boolean"/>
+	<rdfs:label xml:lang="en">available</rdfs:label>
+	<rdfs:label xml:lang="de">verfügbar</rdfs:label>
     </owl:DatatypeProperty>
     
 
@@ -82,6 +92,7 @@
 	    </owl:Class>
 	</rdfs:domain>
         <rdfs:range rdf:resource="&xsd;string"/>
+	<rdfs:label>Jabber ID</rdfs:label>
     </owl:DatatypeProperty>
 
 
@@ -97,11 +108,15 @@
     <owl:ObjectProperty rdf:about="&mate;historyType">
 	<rdfs:domain rdf:resource="&mate;HistoryEntry"/>
         <rdfs:range rdf:resource="&owl;Class"/>
+	<rdfs:label xml:lang="en">history type</rdfs:label>
+	<rdfs:label xml:lang="de">History-Typ</rdfs:label>
     </owl:ObjectProperty>
 
     <owl:ObjectProperty rdf:about="&mate;historyEntries">
 	<rdfs:domain rdf:resource="&mate;HistoryEntry"/>
         <rdfs:range rdf:resource="&rdf;List"/>
+	<rdfs:label xml:lang="en">history entries</rdfs:label>
+	<rdfs:label xml:lang="de">History-Einträge</rdfs:label>
     </owl:ObjectProperty>
 
 
@@ -127,6 +142,8 @@
 
     <owl:Class rdf:about="&mate;AvailabilityResult">
       <primaryKey rdf:resource="&mate;AvailabilityKey"/>
+      <rdfs:label xml:lang="en">Availability Result</rdfs:label>
+      <rdfs:label xml:lang="de">Verfügbarkeitsresultat</rdfs:label>
     </owl:Class>
     
     <PrimaryKey rdf:ID="AvailabilityKey">
@@ -139,6 +156,8 @@
 
     <owl:Class rdf:about="&mate;AvailabilityResultMod">
       <primaryKey rdf:resource="&mate;AvailabilityModKey"/>
+      <rdfs:label xml:lang="en">Availability Result (modified)</rdfs:label>
+      <rdfs:label xml:lang="de">Verfügbarkeitsresultat (modifiziert)</rdfs:label>
     </owl:Class>
     
     <PrimaryKey rdf:ID="AvailabilityModKey">
@@ -149,13 +168,17 @@
 
     <!-- http://www.imis.uni-luebeck.de/mate#HistoryEntry -->
 
-    <owl:Class rdf:about="&mate;HistoryEntry"/>
+    <owl:Class rdf:about="&mate;HistoryEntry">
+      <rdfs:label xml:lang="en">History Entry</rdfs:label>
+      <rdfs:label xml:lang="de">History-Eintrag</rdfs:label>
+    </owl:Class>
 
 
     <!-- http://www.imis.uni-luebeck.de/mate#Person -->
 
     <owl:Class rdf:about="&mate;Person">
         <owl:equivalentClass rdf:resource="&foaf;Person"/>
+        <rdfs:label>Person</rdfs:label>
     </owl:Class>
     
 
@@ -163,6 +186,8 @@
     <!-- http://www.imis.uni-luebeck.de/mate#PrimaryKey -->
 
     <owl:Class rdf:about="&mate;PrimaryKey">
+        <rdfs:label xml:lang="en">Primary Key</rdfs:label>
+        <rdfs:label xml:lang="de">Primärschlüssel</rdfs:label>
         <rdfs:subClassOf rdf:resource="&rdf;List"/>
         <rdfs:subClassOf>
             <owl:Restriction>
