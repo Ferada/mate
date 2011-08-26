@@ -1,5 +1,7 @@
 package reasoner;
 
+import org.slf4j.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +16,7 @@ import comm.StatusMessage;
 import comm.StatusMode;
 
 public class TestSensorReasoner implements StatusReasoner {
+	private static Logger logger = LoggerFactory.getLogger (TestSensorReasoner.class);
 	
 	public class SpeakerPair {
 		public String speaker1;
@@ -92,11 +95,11 @@ public class TestSensorReasoner implements StatusReasoner {
 	public String getStatus(String username, AttributeFields attribute) {
 		switch(attribute) {
 			case ACTIVITY: {				
-				System.out.println("Getting activity status for " + username + ": " + userActivities.get(username));	
+				logger.trace("Getting activity status for " + username + ": " + userActivities.get(username));	
 				return userActivities.get(username);
 			}
 			case INTERRUPTIBILITY: {
-				System.out.println("Getting interruptibility status for " + username + ": " + userInterruptibilities.get(username));
+				logger.trace("Getting interruptibility status for " + username + ": " + userInterruptibilities.get(username));
 				return userInterruptibilities.get(username);
 			}
 			default:		
@@ -185,11 +188,8 @@ public class TestSensorReasoner implements StatusReasoner {
 				String source = msg.getSubject();
 				String user = req.getRequestObject();
 				
-				System.out.println();
-				System.out.println("===============================");	
-				System.out.println("Reasoner update for: " + user);
-				System.out.println("Source: " + source);
-				System.out.println("-------------------------------");				
+				logger.trace("Reasoner update for: " + user);
+				logger.trace("Source: " + source);
 				
 				if (source.equals("daa")) {				
 					if (req.getEntities().containsKey("program") && req.getEntities().containsKey("frequency")) {
@@ -198,8 +198,8 @@ public class TestSensorReasoner implements StatusReasoner {
 						processDAAMessage(user, program, frequency);
 						
 						// Debug
-						System.out.println(program);
-						System.out.println(frequency);
+						logger.trace("program = " + program);
+						logger.trace("frequency = " + frequency);
 					}
 				}
 				
@@ -209,7 +209,7 @@ public class TestSensorReasoner implements StatusReasoner {
 						processCubusMessage(user, cubusstate);
 						
 						// Debug
-						System.out.println(cubusstate);
+						logger.trace("cubusstate = " + cubusstate);
 					}
 				}
 				
@@ -219,7 +219,7 @@ public class TestSensorReasoner implements StatusReasoner {
 						// TODO: auch hier etwas tun
 						
 						// Debug
-						System.out.println(doorstate);
+						logger.trace("doorstate = " + doorstate);
 					}
 				}	
 				
@@ -230,12 +230,10 @@ public class TestSensorReasoner implements StatusReasoner {
 						processMikeMessage(user, speaker1, speaker2);
 						
 						// Debug
-						System.out.println(speaker1);
-						System.out.println(speaker2);
+						logger.trace("speaker1 = " + speaker1);
+						logger.trace("speaker2 = " + speaker2);
 					}
 				}
-				System.out.println("===============================");	
-				System.out.println();
 			}
 		}
 	}

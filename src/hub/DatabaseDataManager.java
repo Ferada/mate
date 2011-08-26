@@ -1,5 +1,7 @@
 package hub;
 
+import org.slf4j.*;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -25,6 +27,7 @@ import hub.AttributeFields;
  * Datenbank-Ebene.
  */
 public class DatabaseDataManager extends DataManager {
+	private static Logger logger = LoggerFactory.getLogger (DatabaseDataManager.class);
 	
 	private static DatabaseDataManager ddm;
 	private static Connection con;
@@ -102,11 +105,11 @@ public class DatabaseDataManager extends DataManager {
 			//con.toString();
 		} catch (SQLException e) {
 		    // handle any errors
-		    System.out.println("SQLException: " + e.getMessage());
-		    System.out.println("SQLState: " + e.getSQLState());
-		    System.out.println("VendorError: " + e.getErrorCode());
+		    logger.error("SQLException: " + e.getMessage());
+		    logger.error("SQLState: " + e.getSQLState());
+		    logger.error("VendorError: " + e.getErrorCode());
 		} catch (ClassNotFoundException e) {
-			System.out.println("Couldn't find class: " + e);
+			logger.error("couldn't find class: " + e);
 		}
 	}
 	
@@ -354,7 +357,7 @@ public class DatabaseDataManager extends DataManager {
 								+ " WHERE " + PRIVACY_SUBJECT + " = '" + subject + "'"
 								+ " AND " + PRIVACY_OBJECT + " = '" + object + "'"
 								+ " AND " + PRIVACY_ENTITY +  " = '" + entity.toString() + "'";
-			System.out.println("Query: " + query);
+			logger.trace("Query: " + query);
 			Statement stmt 	= con.createStatement();
 			stmt.executeUpdate( query );
 			

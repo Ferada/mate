@@ -1,5 +1,7 @@
 package hub;
 
+import org.slf4j.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -34,10 +36,9 @@ import comm.SyntaxAnalyzer;
  * Zentrale Klasse die den AwarenessHub realisiert.
  */
 class AwarenessHub implements MateListener, SMSListener, MailListener, FileTransferListener {
+	private static Logger logger = LoggerFactory.getLogger (AwarenessHub.class);
 	
 	public 	static final String	FILEDIR	= System.getProperty("user.dir") + File.separatorChar + "Files";
-	
-	private static final String DBNAME	= "mate";
 	
 	private final	String 	hubName;
 	private final	String 	hubPassword;
@@ -171,7 +172,7 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 		acceptsAll (asList ("xmpp.username"), "XMPP user name")
 		  .withRequiredArg ().ofType (String.class).defaultsTo ("mate");
 		acceptsAll (asList ("xmpp.password"), "XMPP password")
-		  .withRequiredArg ().ofType (String.class).defaultsTo ("password");
+		  .withRequiredArg ().ofType (String.class).defaultsTo ("test");
 		acceptsAll (asList ("jdbc.driver"), "database driver")
 		  .withRequiredArg ().ofType (String.class).defaultsTo ("com.mysql.jdbc.Driver");
 		acceptsAll (asList ("jdbc.url"), "database connection")
@@ -189,12 +190,12 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 	    };
 
 	  OptionSet options = parser.parse (args);
-	  if (options.has ("h")) {
+	  if (options.has ("help")) {
 	    System.out.println ("Usage: hub.AwarenessHub [OPTION]...");
 	    parser.printHelpOn (System.out);
 	    return;
 	  }
-	  if (options.has ("V")) {
+	  if (options.has ("version")) {
 	    System.out.println ("MATe Awarenesshub (c) 2011");
 	    return;
 	  }
@@ -211,15 +212,6 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 	  Boolean receiveSms = (Boolean) options.valueOf ("sms");
 	  Boolean receiveMail = (Boolean) options.valueOf ("mail");
 
-	  System.out.println ("xmpp.server = \"" + xmppServer + "\"");
-	  System.out.println ("xmpp.username = \"" + xmppUsername + "\"");
-	  System.out.println ("xmpp.password = \"" + xmppPassword + "\"");
-
-	  System.out.println ("jdbc.driver = \"" + jdbcDriver + "\"");
-	  System.out.println ("jdbc.url = \"" + jdbcUrl + "\"");
-	  System.out.println ("jdbc.username = \"" + jdbcUsername + "\"");
-	  System.out.println ("jdbc.password = \"" + jdbcPassword + "\"");
-
 	  AwarenessHub hub = new AwarenessHub (xmppServer, xmppUsername, xmppPassword,
 					       jdbcDriver, jdbcUrl, jdbcUsername, jdbcPassword,
 					       receiveSms, receiveMail);
@@ -230,7 +222,7 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 	public void fileTransferRequest(FileTransferRequest request) {
 		
 		try {
-			System.out.println("AwarenessHub: File Transfer Request");
+			logger.info("AwarenessHub: File Transfer Request");
 			// Eventuelle Ressource abschneiden
 			String jid	= request.getRequestor().split("/")[0];
 			String user = dataManager.getUsernameByJID(jid);
