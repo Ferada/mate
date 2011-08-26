@@ -6,13 +6,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-import java.util.Properties;
-
-import static java.util.Arrays.asList;
-
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
@@ -157,64 +150,23 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 	 * @param args Kommandozeilenparameter in der Reihenfolge der
 	 * 				Attribute in AwarenessHub(...)
 	 */
-	public static void main(String[] args) throws Exception {
-	  OptionParser parser = new OptionParser () {
-	      {
-		acceptsAll (asList ("h", "?", "help"), "display this help and exit");
-		acceptsAll (asList ("V", "version"), "output version information and exit");
-		acceptsAll (asList ("v", "verbose"), "be more verbose")
-		  .withOptionalArg ().ofType (String.class).defaultsTo ("debug");
-		acceptsAll (asList ("c", "conf"), "configuration file")
-		  .withRequiredArg ().ofType (String.class).defaultsTo ("config.xml");
-		
-		acceptsAll (asList ("xmpp.server"), "XMPP server name")
-		  .withRequiredArg ().ofType (String.class).defaultsTo ("localhost");
-		acceptsAll (asList ("xmpp.username"), "XMPP user name")
-		  .withRequiredArg ().ofType (String.class).defaultsTo ("mate");
-		acceptsAll (asList ("xmpp.password"), "XMPP password")
-		  .withRequiredArg ().ofType (String.class).defaultsTo ("test");
-		acceptsAll (asList ("jdbc.driver"), "database driver")
-		  .withRequiredArg ().ofType (String.class).defaultsTo ("com.mysql.jdbc.Driver");
-		acceptsAll (asList ("jdbc.url"), "database connection")
-		  .withRequiredArg ().ofType (String.class).defaultsTo ("jdbc:mysql://localhost/mate");
-		acceptsAll (asList ("jdbc.username"), "database user")
-		  .withRequiredArg ().ofType (String.class).defaultsTo ("mate");
-		acceptsAll (asList ("jdbc.password"), "database password")
-		  .withRequiredArg ().ofType (String.class).defaultsTo ("password");
-		/* TODO: this should be mail reception and sending as well as for sms */
-		acceptsAll (asList ("mail"), "enable mail reception")
-			.withOptionalArg ().ofType (Boolean.class).defaultsTo (Boolean.FALSE);
-		acceptsAll (asList ("sms"), "enable sms reception")
-			.withOptionalArg ().ofType (Boolean.class).defaultsTo (Boolean.FALSE);
-	      }
-	    };
+	public static void main(String args[]) throws Exception {
+	  Options options = Options.parse (args);
 
-	  OptionSet options = parser.parse (args);
-	  if (options.has ("help")) {
+	  if (options.help) {
 	    System.out.println ("Usage: hub.AwarenessHub [OPTION]...");
-	    parser.printHelpOn (System.out);
+	    options.parser.printHelpOn (System.out);
 	    return;
 	  }
-	  if (options.has ("version")) {
+	  if (options.version) {
 	    System.out.println ("MATe Awarenesshub (c) 2011");
 	    return;
 	  }
 
-	  String xmppServer = (String) options.valueOf ("xmpp.server");
-	  String xmppUsername = (String) options.valueOf ("xmpp.username");
-	  String xmppPassword = (String) options.valueOf ("xmpp.password");
-
-	  String jdbcDriver = (String) options.valueOf ("jdbc.driver");
-	  String jdbcUrl = (String) options.valueOf ("jdbc.url");
-	  String jdbcUsername = (String) options.valueOf ("jdbc.username");
-	  String jdbcPassword = (String) options.valueOf ("jdbc.password");
-
-	  Boolean receiveSms = (Boolean) options.valueOf ("sms");
-	  Boolean receiveMail = (Boolean) options.valueOf ("mail");
-
-	  AwarenessHub hub = new AwarenessHub (xmppServer, xmppUsername, xmppPassword,
-					       jdbcDriver, jdbcUrl, jdbcUsername, jdbcPassword,
-					       receiveSms, receiveMail);
+	  AwarenessHub hub = new AwarenessHub (options.xmppServer, options.xmppUsername, options.xmppPassword,
+	  				       options.jdbcDriver, options.jdbcUrl,
+					       options.jdbcUsername, options.jdbcPassword,
+	  				       options.sms, options.mail);
 	}
 
 
