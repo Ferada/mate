@@ -22,61 +22,107 @@
 	<rdfs:label xml:lang="en">MATe Sensors Ontology</rdfs:label>
 	<rdfs:label xml:lang="de">MATe Sensor Ontologie</rdfs:label>
     </owl:Ontology>
-    
+
+    <!-- MIKE SENSOR -->
+
+    <owl:Class rdf:about="&sensors;MikeSensorValue">
+	<rdfs:label xml:lang="en">Mike Sensor Value</rdfs:label>
+	<rdfs:label xml:lang="de">Mike-Sensorwert</rdfs:label>
+    </owl:Class>
+
+    <owl:ObjectProperty rdf:about="&sensors;mikeSensorSpeaker">
+	<rdfs:domain rdf:resource="&sensors;MikeSensorValue"/>
+	<!-- <rdfs:range rdf:resource="&xsd;string"/> --> <!-- has this one a specific range? -->
+	<rdfs:label xml:lang="en">Mike Sensor Speaker</rdfs:label>
+	<rdfs:label xml:lang="en">Mike-Sensorsprecher</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- DESKTOP SENSOR -->
+
+    <owl:Class rdf:about="&sensors;DesktopSensorValue">
+	<rdfs:label xml:lang="en">Desktop Sensor Value</rdfs:label>
+	<rdfs:label xml:lang="de">Desktopsensorwert</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="&sensors;DesktopSensorFrequency">
+	<owl:oneOf rdf:parseType="Collection">
+	    <owl:Thing rdf:about="#inactive"/>
+	    <owl:Thing rdf:about="#active"/>
+	    <owl:Thing rdf:about="#very_active"/>
+	</owl:oneOf>
+	<rdfs:label xml:lang="en">Desktop Sensor Frequency</rdfs:label>
+	<rdfs:label xml:lang="de">Desktopsensorfrequenz</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="&sensors;DesktopSensorProgram">
+	<owl:oneOf rdf:parseType="Collection">
+	    <owl:Thing rdf:about="#unknown"/>
+	    <owl:Thing rdf:about="#text"/>
+	    <owl:Thing rdf:about="#browser"/>
+	</owl:oneOf>
+	<rdfs:label xml:lang="en">Desktop Sensor Program</rdfs:label>
+	<rdfs:label xml:lang="de">Desktopsensorprogramm</rdfs:label>
+    </owl:Class>
+
+    <owl:ObjectProperty rdf:about="&sensors;desktopSensorProgram">
+        <rdfs:domain rdf:resource="&sensors;DesktopSensorValue"/>
+        <rdfs:range rdf:resource="&sensors;DesktopSensorProgram"/>
+	<rdfs:label xml:lang="en">desktop sensor program</rdfs:label>
+	<rdfs:label xml:lang="de">Desktopsensorprogramm</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="&sensors;desktopSensorFrequency">
+        <rdfs:domain rdf:resource="&sensors;DesktopSensorValue"/>
+        <rdfs:range rdf:resource="&sensors;DesktopSensorFrequency"/>
+	<rdfs:label xml:lang="en">desktop sensor frequency</rdfs:label>
+	<rdfs:label xml:lang="de">Desktopsensorfrequenz</rdfs:label>
+    </owl:ObjectProperty>
+ 
+    <!-- CUBE SENSOR -->
+
+    <owl:Class rdf:about="&sensors;CubeSensorValue">
+	<rdfs:label xml:lang="en">Cube Sensor Value</rdfs:label>
+	<rdfs:label xml:lang="de">Cube-Sensorwert</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="&sensors;CubeSensorState">
+	<owl:oneOf rdf:parseType="Collection">
+	    <owl:Thing rdf:about="#shortBreak"/>
+	    <owl:Thing rdf:about="#longBreak"/>
+	    <owl:Thing rdf:about="#reading"/>
+	    <owl:Thing rdf:about="#writing"/>
+	    <owl:Thing rdf:about="#meeting"/>
+	</owl:oneOf>
+	<rdfs:label xml:lang="en">Cube Sensor State</rdfs:label>
+	<rdfs:label xml:lang="de">Cube-Sensorzustand</rdfs:label>
+    </owl:Class>
+
+    <owl:ObjectProperty rdf:about="&sensors;cubeSensorState">
+	<rdfs:domain rdf:resource="&sensors;CubeSensorValue"/>
+	<rdfs:range rdf:resource="&sensors;CubeSensorState"/>
+	<rdfs:label xml:lang="en">cube state</rdfs:label>
+	<rdfs:label xml:lang="de">Cube-Sensorzustand</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- DOOR SENSOR -->
+
+    <owl:Class rdf:about="&sensors;DoorSensorValue">
+	<rdfs:label xml:lang="en">Door Sensor Value</rdfs:label>
+	<rdfs:label xml:lang="de">Türsensorwert</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="&sensors;DoorSensorState">
+	<owl:oneOf rdf:parseType="Collection">
+	    <owl:Thing rdf:about="#uninterruptible"/>    <!-- 0 -->
+	    <owl:Thing rdf:about="#interruptible"/>      <!-- 1 -->
+	    <owl:Thing rdf:about="#maybeInterruptible"/> <!-- 2 -->
+	</owl:oneOf>
+	<rdfs:label xml:lang="en">Door Sensor State</rdfs:label>
+	<rdfs:label xml:lang="de">Türsensorzustand</rdfs:label>
+    </owl:Class>
 
 
-    <!-- 
-    ///////////////////////////////////////////////////////////////////////////////////////
-    //
-    // Datatypes
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////
-     -->
-
-    
-
-
-    <!-- 
-    ///////////////////////////////////////////////////////////////////////////////////////
-    //
-    // Data properties
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////
-     -->
-
-    
-
-
-    <!-- http://www.imis.uni-luebeck.de/mate/sensors#available -->
-
-    <owl:DatatypeProperty rdf:about="&sensors;available">
-        <rdfs:domain rdf:resource="&sensors;AvailabilitySensorValue"/>
-        <rdfs:range rdf:resource="&xsd;boolean"/>
-	<rdfs:label xml:lang="en">available</rdfs:label>
-	<rdfs:label xml:lang="de">verfügbar</rdfs:label>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://www.imis.uni-luebeck.de/mate/sensors#jid -->
-
-    <owl:DatatypeProperty rdf:about="&sensors;jid">
-        <rdfs:domain rdf:resource="&sensors;AvailabilitySensorValue"/>
-        <rdfs:range rdf:resource="&xsd;string"/>
-	<rdfs:label>Jabber ID</rdfs:label>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- 
-    ///////////////////////////////////////////////////////////////////////////////////////
-    //
-    // Classes
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////
-     -->
-
-    
+    <!-- OLD STUFF -->
 
 
     <!-- http://www.imis.uni-luebeck.de/mate/sensors#AvailabilitySensorValue -->
@@ -92,12 +138,18 @@
 	<rdf:rest rdf:resource="&rdf;nil"/>
     </mate:PrimaryKey>
 
-
-    <!-- http://www.imis.uni-luebeck.de/mate/sensors#Sensor -->
-
-    <owl:Class rdf:about="&sensors;Sensor">
-        <rdfs:label>Sensor</rdfs:label>
-    </owl:Class>
+    <owl:DatatypeProperty rdf:about="&sensors;available">
+        <rdfs:domain rdf:resource="&sensors;AvailabilitySensorValue"/>
+        <rdfs:range rdf:resource="&xsd;boolean"/>
+	<rdfs:label xml:lang="en">available</rdfs:label>
+	<rdfs:label xml:lang="de">verfügbar</rdfs:label>
+    </owl:DatatypeProperty>
+    
+    <owl:DatatypeProperty rdf:about="&sensors;jid">
+        <rdfs:domain rdf:resource="&sensors;AvailabilitySensorValue"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+	<rdfs:label>Jabber ID</rdfs:label>
+    </owl:DatatypeProperty>
 </rdf:RDF>
 
 
