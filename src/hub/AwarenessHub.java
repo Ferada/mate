@@ -65,13 +65,17 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 		
 		// Ressourcen initialisieren
 		dataManager		= DatabaseDataManager.createDataManager(jdbcDriver,dbUrl,dbUsername,dbPassword);
+		logger.info ("connected to database");
+
 		generator 		= new Generator(new SMSGateway(receiveSMS), new MailGateway(receiveMail), connection);
 		contextAnalyzer = new ContextAnalyzer(fileTransferManager, dataManager);
 		syntaxAnalyzer 	= new SyntaxAnalyzer();
 		
 		connection.connect();
+		logger.info ("connected to XMPP server");
 		// Einloggen
 		connection.login(hubName, hubPassword);
+		logger.info ("logged in on XMPP server");
 		
 		// Manager für den XMPP-Dateitransfer initialisieren
 		fileTransferManager = new FileTransferManager(connection);
@@ -90,6 +94,7 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 			}
 		}
 		connection.disconnect();
+		logger.info ("disconnected from XMPP server");
 	}
 	
 	@Override

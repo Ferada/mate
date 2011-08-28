@@ -39,7 +39,9 @@ public final class TinyJabber {
 	    .withRequiredArg ().ofType (Boolean.class).defaultsTo (Boolean.TRUE);
 
 	  acceptsAll (asList ("t", "type"), "message type (one of cube, mike, door, desktop, none or unknown)")
-	    .withRequiredArg ().ofType (String.class);
+	    .withRequiredArg ().ofType (String.class).defaultsTo ("none");
+
+	  acceptsAll (asList ("stdin"), "read message to send from stdin");
 	}
       };
 
@@ -58,15 +60,17 @@ public final class TinyJabber {
 
     boolean help = options.has ("help") || !validType;
     List<String> optArgs = options.nonOptionArguments ();
-    if ((type.equals ("cube") || type.equals ("door")) && optArgs.size () < 1) {
-      System.out.println ("cube and door need one parameter");
-      help = true;
-      exit = -1;
-    }
-    else if ((type.equals ("desktop") || type.equals ("mike")) && optArgs.size () < 2) {
-      System.out.println ("cube and door need two parameters");
-      help = true;
-      exit = -1;
+    if (!help) {
+      if ((type.equals ("cube") || type.equals ("door")) && optArgs.size () < 1) {
+	System.out.println ("cube and door need one parameter");
+	help = true;
+	exit = -1;
+      }
+      else if ((type.equals ("desktop") || type.equals ("mike")) && optArgs.size () < 2) {
+	System.out.println ("cube and door need two parameters");
+	help = true;
+	exit = -1;
+      }
     }
 
     if (help) {
@@ -145,13 +149,26 @@ public final class TinyJabber {
     System.in.read ();
   }
 
-  public static void send (OptionSet options, XMPPConnection mate) {
+  public static void send (OptionSet options, XMPPConnection mate) throws Exception {
     String type = (String) options.valueOf ("type");
     String body = null;
     String user = (String) options.valueOf ("mate.user");
     List<String> args = options.nonOptionArguments ();
 
-    if (type.equals ("none"))
+    if (options.has ("stdin")) {
+      final char buffer[] = new char[1024];
+      StringBuilder builder = new StringBuilder ();
+      Reader reader = new InputStreamReader (System.in, "utf-8");
+      int read;
+      do {
+	read = reader.read (buffer, 0, buffer.length);
+	if (read > 0)
+	  builder.append (buffer, 0, read);
+      } while (read >= 0);
+
+      body = builder.toString ();
+    }
+    else if (type.equals ("none"))
       body = makeNoneMessage (user);
     else if (type.equals ("unknown"))
       body = makeUnknownMessage (user);

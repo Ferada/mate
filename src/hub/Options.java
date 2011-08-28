@@ -19,6 +19,7 @@ public class Options {
 
   public OptionParser parser;
 
+  private ArgumentAcceptingOptionSpec<File> confOpt;
   private ArgumentAcceptingOptionSpec<String> xmppServerOpt;
   private ArgumentAcceptingOptionSpec<String> xmppUsernameOpt;
   private ArgumentAcceptingOptionSpec<String> xmppPasswordOpt;
@@ -58,8 +59,8 @@ public class Options {
 	  acceptsAll (asList ("h", "?", "help"), "display this help and exit");
 	  acceptsAll (asList ("V", "version"), "output version information and exit");
 
-	  acceptsAll (asList ("c", "conf"), "configuration file")
-	    .withRequiredArg ();
+	  confOpt = acceptsAll (asList ("c", "conf"), "configuration file")
+	    .withRequiredArg ().ofType (File.class).defaultsTo (new File ("config.xml"));
 
 	  map.put (xmppServerOpt = acceptsAll (asList ("xmpp.server"), "XMPP server name")
 		   .withRequiredArg (),
@@ -112,22 +113,11 @@ public class Options {
   }
 
   private void parseArguments (String args[]) throws Exception {
-    String confString = "config.xml";
-
-    for (int i = 0; i < args.length; ++i) {
-      if (args[i].equals ("-c") || args[i].equals ("--conf")) {
-	if ((i+1) == args.length)
-	  throw new Exception ("argument missing for 'conf' option");
-	confString = args[i+1];
-	break;
-      }
-    }
-
-    logger.trace ("confString = " + confString);
+    set = parser.parse (args);
 
     FileInputStream file = null;
     try {
-      file = new FileInputStream (confString);
+      file = new FileInputStream (confOpt.value (set));
       properties = new Properties ();
       properties.loadFromXML (file);
     }
@@ -138,8 +128,6 @@ public class Options {
     finally {
       if (file != null) file.close ();
     }
-
-    set = parser.parse (args);
 
     help = set.has ("help");
     version = set.has ("version");
