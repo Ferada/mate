@@ -109,14 +109,14 @@ public final class TinyJabber {
 	send (options, mate);
 
       if ((Boolean) options.valueOf ("listen"))
-	listen (mate);
+	listen (mate, options.has ("stdin"));
     }
     finally {
       mate.disconnect ();
     }
   }
 
-  public static void listen (XMPPConnection mate) throws Exception {
+  public static void listen (XMPPConnection mate, boolean stdin) throws Exception {
     PacketListener listener = new PacketListener () {
 	public void processPacket (Packet packet) {
 	  System.out.println ("id: " + packet.getPacketID ());
@@ -145,8 +145,14 @@ public final class TinyJabber {
 	}
       };
     mate.addPacketListener (listener, null);
-    System.out.println ("press any key to continue ...");
-    System.in.read ();
+    System.out.println ("listening for packets ...");
+    if (!stdin) {
+      System.out.println ("press any key to continue ...");
+      System.in.read ();
+    }
+    else
+      for (;;)
+	Thread.sleep (5000);
   }
 
   public static void send (OptionSet options, XMPPConnection mate) throws Exception {
