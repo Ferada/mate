@@ -2,6 +2,8 @@ package hub;
 
 import org.slf4j.*;
 
+import board.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -45,6 +47,8 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 	private			Generator			generator;
 	
 	private			boolean	run = true;
+
+	private	final		Whiteboard whiteboard;
 	
 	/**
 	 * Erzeugt eine AwarenessHub-Instanz, loggt sich als JabberClient ein,
@@ -53,7 +57,7 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 	 */
 	public AwarenessHub(String host, String username, String password,
 			    String jdbcDriver, String dbUrl, String dbUsername, String dbPassword,
-			    boolean receiveSMS, boolean receiveMail) {
+			    boolean receiveSMS, boolean receiveMail) throws Exception {
 		// Logindaten initialisieren
 		server		= host;
 		hubName		= username;
@@ -70,7 +74,9 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 		generator 		= new Generator(new SMSGateway(receiveSMS), new MailGateway(receiveMail), connection);
 		contextAnalyzer = new ContextAnalyzer(fileTransferManager, dataManager);
 		syntaxAnalyzer 	= new SyntaxAnalyzer();
-		
+
+		whiteboard = new Whiteboard();
+
 		connection.connect();
 		logger.info ("connected to XMPP server");
 		// Einloggen
@@ -84,17 +90,25 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 	    if(!fileDirectory.exists()) {
 	    	fileDirectory.mkdirs();
 	    }
-		
+	}
+
+	public void run() {
 		// Schleife die mit run=false unterbrochen werden kann
 		while (run) {
 			try {
 				Thread.sleep(250);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+			  // do nothing
 			}
 		}
-		connection.disconnect();
-		logger.info ("disconnected from XMPP server");
+	}
+
+	public void shutdown() {
+		logger.info ("shutdown");
+		if (connection.isConnected ()) {
+			connection.disconnect();
+			logger.info ("disconnected from XMPP server");
+		}
 	}
 	
 	@Override
@@ -168,10 +182,20 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 	    return;
 	  }
 
-	  AwarenessHub hub = new AwarenessHub (options.xmppServer, options.xmppUsername, options.xmppPassword,
-	  				       options.jdbcDriver, options.jdbcUrl,
-					       options.jdbcUsername, options.jdbcPassword,
-	  				       options.sms, options.mail);
+	  final AwarenessHub hub = new AwarenessHub (options.xmppServer, options.xmppUsername,
+						     options.xmppPassword,
+						     options.jdbcDriver, options.jdbcUrl,
+						     options.jdbcUsername, options.jdbcPassword,
+						     options.sms, options.mail);
+
+	  Runtime.getRuntime().addShutdownHook (new Thread () {
+	      public void run() {
+		hub.shutdown ();
+	      }
+	    }
+	    );
+
+	  hub.run ();
 	}
 
 
