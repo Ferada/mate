@@ -76,6 +76,7 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 		syntaxAnalyzer 	= new SyntaxAnalyzer();
 
 		whiteboard = new Whiteboard();
+		whiteboard.registerClient(new LoggingClient());
 
 		connection.connect();
 		logger.info ("connected to XMPP server");
@@ -131,6 +132,8 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 	
 	@Override
 	public void processMessage(DeviceMateMessage m) {
+		whiteboard.processMessage (m);
+
 		// Eventuelle Ressource abschneiden
 		m.setSubjectDevice(m.getSubjectDevice().split("/")[0]);
 		

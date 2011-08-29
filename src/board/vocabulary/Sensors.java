@@ -22,7 +22,7 @@ public final class Sensors {
   /**
    * Returns a new property in this namespace with a given name.
    */
-  private static Property property (String name) {
+  public static Property property (String name) {
     return ResourceFactory.createProperty (uri, name);
   }
 }

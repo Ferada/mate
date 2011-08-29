@@ -7,6 +7,7 @@ import com.hp.hpl.jena.graph.*;
 import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.update.*;
 import com.hp.hpl.jena.shared.*;
+import com.hp.hpl.jena.reasoner.*;
 import com.hp.hpl.jena.ontology.*;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.graph.compose.*;
@@ -29,12 +30,19 @@ import java.util.concurrent.*;
 
 import board.vocabulary.*;
 
+import comm.*;
+
 /**
  * The main class implementing all the behaviour of a typical
  * {@link Board}.  May be run within a thread.
  */
 public class Whiteboard implements Board, Runnable {
   private static Logger logger = LoggerFactory.getLogger (Whiteboard.class);
+
+  /**
+   *
+   */
+  com.hp.hpl.jena.reasoner.Reasoner reasoner;
 
   /**
    * Contains the public world knowledge (except sensor data).
@@ -72,9 +80,19 @@ public class Whiteboard implements Board, Runnable {
   public MateOntology mateOntology;
 
   /**
+   *
+   */
+  com.hp.hpl.jena.reasoner.Reasoner mateReasoner;
+
+  /**
    * Contains the extended parts for sensors and their values.
    */
   public MateOntology sensorOntology;
+
+  /**
+   *
+   */
+  com.hp.hpl.jena.reasoner.Reasoner sensorReasoner;
 
   /**
    * Default prefixes for convenience and smaller text.
@@ -177,6 +195,15 @@ public class Whiteboard implements Board, Runnable {
     privateStores = new HashMap<Client, GraphStore> ();
 
     combiners = new HashMap<String, Combiner> ();
+
+    reasoner = ReasonerRegistry.getOWLMicroReasoner ();
+    // reasoner = ReasonerRegistry.getOWLMiniReasoner ();
+    // reasoner = ReasonerRegistry.getOWLReasoner ();
+
+    mateReasoner = reasoner.bindSchema (mateOntology.model);
+    sensorReasoner = reasoner.bindSchema (sensorOntology.model);
+
+    
   }
 
   /**
@@ -328,10 +355,24 @@ public class Whiteboard implements Board, Runnable {
    * Checks whether a model is consistent with respect to the given
    * ontology.
    */
-  public boolean isConsistent (MateOntology ontology, Model model) {
+  public boolean isConsistent (MateOntology ontology, com.hp.hpl.jena.reasoner.Reasoner reasoner, Model model) {
     // consistency checking on every posted model
-    //InfModel inf = ModelFactory.createInfModel (boundReasoner, data);
-    return true;
+    InfModel infmodel = ModelFactory.createInfModel (reasoner, model);
+    ValidityReport validity = infmodel.validate ();
+    if (validity.isClean ())
+      return true;
+    boolean valid = validity.isValid ();
+    if (valid)
+      logger.warn ("model is not clean; we treat this as an error though");
+    else
+      logger.error ("model is inconsistent");
+    for (Iterator<ValidityReport.Report> it = validity.getReports (); it.hasNext ();)
+      if (valid)
+	logger.warn (it.next ().toString ());
+      else
+	logger.error (it.next ().toString ());
+    // return valid;
+    return false;
   }
 
   /**
@@ -379,7 +420,7 @@ public class Whiteboard implements Board, Runnable {
     List<Triple> result = new ArrayList<Triple> ();
 
     for (Property property : klass.primaryKey) {
-      Statement value = marker.getProperty (property);
+      Statement value = marker.getRequiredProperty (property);
       result.add (new Triple (var,
 			      Node.createURI (property.getURI ()),
 			      value.getObject ().asNode ()));
@@ -440,7 +481,7 @@ public class Whiteboard implements Board, Runnable {
   }
 
   public void postWorldUpdate (Client poster, Model model) {
-    if (!isConsistent (mateOntology, model)) {
+    if (!isConsistent (mateOntology, mateReasoner, model)) {
       logger.warn ("update isn't consistent with respect to the mate ontology, discarding");
       return;
     }
@@ -461,12 +502,12 @@ public class Whiteboard implements Board, Runnable {
   }
 
   public void postSensorUpdate (Client poster, Model model) {
-    if (!isConsistent (sensorOntology, model)) {
+    if (!isConsistent (sensorOntology, sensorReasoner, model)) {
       logger.warn ("update isn't consistent with respect to the sensor ontology, discarding");
       return;
     }
 
-    if (poster instanceof Reasoner)
+    if (poster instanceof board.Reasoner)
       logger.warn ("a reasoner probably shouldn't post sensor value updates");
 
     postGenericUpdate (sensorOntology, poster, model, true, false);
@@ -533,7 +574,14 @@ public class Whiteboard implements Board, Runnable {
 
 	/* for every resource in the primary key, check whether it has
 	   the given value: "?s resource value" */
-	addPrimaryKeyChecks (var_s, markerResource, klass, group);
+	try {
+	  addPrimaryKeyChecks (var_s, markerResource, klass, group);
+	}
+	catch (PropertyNotFoundException e) {
+	  logger.error ("model didn't conform to its schema, missing property: " + e + ", skipping this update");
+	  continue;
+	}
+
 	group.addTriplePattern (new Triple (var_s, var_p, var_o));
 
 	modify.setElement (group);
@@ -751,5 +799,45 @@ public class Whiteboard implements Board, Runnable {
     StringWriter writer = new StringWriter ();
     model.write (writer, language);
     return writer.toString ();
+  }
+
+  /**
+   * Takes a {@link DeviceMateMessage} and handles it depending on its
+   * sub-type (i.e. we only do stuff on {@link StatusMessage} objects).
+   */
+  public synchronized void processMessage (DeviceMateMessage message) {
+    if (message instanceof CommMessage) {
+      CommMessage comm = (CommMessage) message;
+      logger.warn ("got CommMessage " + comm + ", ignoring");
+      return;
+    }
+    else if (message instanceof ResponseMessage) {
+      ResponseMessage response = (ResponseMessage) message;
+      logger.warn ("got ResponseMessage " + response + ", ignoring");
+      return;
+    }
+    else if (!(message instanceof StatusMessage)) {
+      logger.warn ("got unknown sub-type of DeviceMateMessage " + message + ", ignoring");
+      return;
+    }
+
+    StatusMessage status = (StatusMessage) message;
+    Request request = status.getRequest ();
+
+    logger.info ("got StatusMessage " + status);
+    logger.info ("from " + message.getSubjectDevice () + " to " + message.getObjectDevice ());
+
+    if (!(status.getMode ().equals (StatusMode.PUSH) &&
+	  request.getRequestType ().equals (RequestType.DATA))) {
+      logger.warn ("mode not 'push' or request-type not 'data', ignoring");
+      return;
+    }
+	
+    Model model = MessageConverter.convert (status);
+    /* TODO: we _need_ a client for each different sensor, else it is
+       useless regarding combining update values ...
+       maybe get it from a hashtable and generate them on demand? */
+    if (model != null)
+      postSensorUpdate (null, model);
   }
 }
