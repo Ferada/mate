@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties version="1.0">
+  <entry key="jdbc.url">jdbc:postgresql:mate</entry>
+  <entry key="jdbc.username">mate</entry>
+  <entry key="jdbc.password">password</entry>
+  <entry key="jdbc.driver">org.postgresql.Driver</entry>
+  <entry key="xmpp.server">localhost</entry>
+  <entry key="xmpp.username">hub</entry>
+  <entry key="xmpp.password">hub</entry>
+  <entry key="mail">false</entry>
+  <entry key="sms">false</entry>
+</properties>

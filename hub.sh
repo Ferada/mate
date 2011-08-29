@@ -1,3 +1,3 @@
 #!/bin/sh
 
-exec ./run.sh --conf local-config.xml $*
+exec ./run.sh --conf postgres-config.xml $*
