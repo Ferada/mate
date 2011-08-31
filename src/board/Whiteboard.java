@@ -160,13 +160,13 @@ public class Whiteboard implements Board, Runnable {
        ...
        mateOntology = FileManaget.get ().loadModel (Mate.uri ...)
     */
-    mateOntology = loadOntology ("mate.owl", "RDF/XML");
+    mateOntology = loadOntology ("mate.n3", "N3");
     /* maps the mateOntology object to the URI, */
     /* TODO: except this doesn't work as expected, i.e. the model is probably copied */
     OntDocumentManager.getInstance ().addModel (Mate.uri.substring (0, Mate.uri.length () - 1), mateOntology.model, true);
     /* ... so this ontology can properly import its classes.  this creates
        duplicate classes for the mate ontology, but that is no problem atm */
-    sensorOntology = loadOntology ("sensors.owl", "RDF/XML");
+    sensorOntology = loadOntology ("sensors.n3", "N3");
     sensorOntology.addBaseOntology (mateOntology);
 
     /* and here the cached model from above isn't shown */

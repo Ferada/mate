@@ -1,0 +1,100 @@
+@prefix :        <http://www.imis.uni-luebeck.de/mate#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix mate:    <http://www.imis.uni-luebeck.de/mate#> .
+
+mate:AvailabilityResult
+      a       owl:Class ;
+      rdfs:label "Verfügbarkeitsresultat"@de , "Availability Result"@en ;
+      mate:primaryKey mate:AvailabilityKey .
+
+rdf:List
+      a       owl:Class .
+
+mate:Person
+      a       owl:Class ;
+      rdfs:label "Person" ;
+      owl:equivalentClass foaf:Person .
+
+mate:AvailabilityResultMod
+      a       owl:Class ;
+      rdfs:label "Availability Result (modified)"@en , "Verfügbarkeitsresultat (modifiziert)"@de ;
+      mate:primaryKey mate:AvailabilityModKey .
+
+rdf:first
+      a       owl:ObjectProperty .
+
+<http://www.imis.uni-luebeck.de/mate>
+      a       owl:Ontology ;
+      rdfs:label "MATe Ontologie"@de , "MATe Ontology"@en ;
+      owl:imports foaf: .
+
+owl:Property
+      a       owl:Class .
+
+mate:primaryKey
+      a       owl:AnnotationProperty ;
+      rdfs:comment """Definiert einen Primärschlüssel der
+	angegebenen Klasse.  Diese Funktion wird von der MATe
+	Whiteboard-Implementierung benutzt um beispielsweise Sensordaten
+	in die Datenbank zu speichern und Histories darüber anzulegen."""@de , """Defines one of the primary keys of the
+	given class.  This is used by the MATe Whiteboard implementation
+	for example to merge new sensor values into the database and
+	create histories on them."""@en .
+
+mate:AvailabilityKey
+      a       mate:PrimaryKey ;
+      rdf:first mate:jid ;
+      rdf:rest () .
+
+mate:jid
+      a       owl:DatatypeProperty ;
+      rdfs:domain
+              [ a       owl:Class ;
+                owl:unionOf (mate:AvailabilityResult mate:HistoryEntry mate:AvailabilityResultMod)
+              ] ;
+      rdfs:label "Jabber ID" ;
+      rdfs:range xsd:string .
+
+mate:HistoryEntry
+      a       owl:Class ;
+      rdfs:label "History Entry"@en , "History-Eintrag"@de .
+
+mate:available
+      a       owl:DatatypeProperty ;
+      rdfs:domain
+              [ a       owl:Class ;
+                owl:unionOf (mate:AvailabilityResult mate:HistoryEntry mate:AvailabilityResultMod)
+              ] ;
+      rdfs:label "available"@en , "verfügbar"@de ;
+      rdfs:range xsd:boolean .
+
+mate:PrimaryKey
+      a       owl:Class ;
+      rdfs:label "Primary Key"@en , "Primärschlüssel"@de ;
+      rdfs:subClassOf rdf:List ;
+      rdfs:subClassOf
+              [ a       owl:Restriction ;
+                owl:allValuesFrom owl:Property ;
+                owl:onProperty rdf:first
+              ] .
+
+mate:historyType
+      a       owl:ObjectProperty ;
+      rdfs:domain mate:HistoryEntry ;
+      rdfs:label "history type"@en , "History-Typ"@de ;
+      rdfs:range owl:Class .
+
+mate:historyEntries
+      a       owl:ObjectProperty ;
+      rdfs:domain mate:HistoryEntry ;
+      rdfs:label "History-Einträge"@de , "history entries"@en ;
+      rdfs:range rdf:List .
+
+mate:AvailabilityModKey
+      a       mate:PrimaryKey ;
+      rdf:first mate:jid ;
+      rdf:rest () .

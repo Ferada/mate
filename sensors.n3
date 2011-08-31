@@ -1,0 +1,165 @@
+@prefix :        <http://www.imis.uni-luebeck.de/mate/sensors#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix mate:    <http://www.imis.uni-luebeck.de/mate#> .
+
+# describes this ontology
+<http://www.imis.uni-luebeck.de/mate/sensors>
+      a       owl:Ontology ;
+      rdfs:label "MATe Sensor Ontologie"@de , "MATe Sensors Ontology"@en ;
+      owl:imports <http://www.imis.uni-luebeck.de/mate> .
+
+:DoorSensorState
+      a       owl:Class ;
+      rdfs:label "Türsensorzustand"@de , "Door Sensor State"@en ;
+      owl:oneOf (:uninterruptible :interruptible :maybeInterruptible) .
+
+# :meeting
+#       a       owl:Thing .
+
+# :reading
+#       a       owl:Thing .
+
+# :uninterruptible
+#       a       owl:Thing .
+
+# :longBreak
+#       a       owl:Thing .
+
+# :unknown
+#       a       owl:Thing .
+
+# :inactive
+#       a       owl:Thing .
+
+# :active
+#       a       owl:Thing .
+
+# :maybeInterruptible
+#       a       owl:Thing .
+
+# :browser
+#       a       owl:Thing .
+
+# :text
+#       a       owl:Thing .
+
+# :very_active
+#       a       owl:Thing .
+
+# :shortBreak
+#       a       owl:Thing .
+
+# :writing
+#       a       owl:Thing .
+
+# :interruptible
+#       a       owl:Thing .
+
+# object properties
+
+:sensorJid
+      a       owl:ObjectProperty ;
+      rdfs:domain :SensorValue ;
+      rdfs:label "Sensor-JID"@de, "sensor JID"@en ;
+      rdfs:comment "Jabber ID of the sensor this value originated from."@en ,
+                   "Jabber-ID des Sensors von dem dieser Wert stammt."@de .
+
+:userJid
+      a       owl:ObjectProperty ;
+      rdfs:domain :SensorValue ;
+              # [ a       owl:Class ;
+              #   owl:unionOf (:MikeSensorValue :DesktopSensorValue :CubeSensorValue :DoorSensorValue)
+              # ] ;
+      rdfs:label "Benutzer-JID"@de , "user JID"@en ;
+      rdfs:comment "Jabber ID of the user this value is meant for."@en ,
+                   "Jabber-ID des Benutzers für den dieser Wert bestimmt ist."@de .
+
+:desktopSensorProgram
+      a       owl:ObjectProperty ;
+      rdfs:domain :DesktopSensorValue ;
+      rdfs:label "Desktopsensorprogramm"@de , "desktop sensor program"@en ;
+      rdfs:range :DesktopSensorProgram .
+
+:desktopSensorFrequency
+      a       owl:ObjectProperty ;
+      rdfs:domain :DesktopSensorValue ;
+      rdfs:label "desktop sensor frequency"@en , "Desktopsensorfrequenz"@de ;
+      rdfs:range :DesktopSensorFrequency .
+
+:mikeSensorSpeaker
+      a       owl:ObjectProperty ;
+      rdfs:domain :MikeSensorValue ;
+      rdfs:label "Mike-Sensorsprecher"@en , "Mike Sensor Speaker"@en .
+
+:cubeSensorState
+      a       owl:ObjectProperty ;
+      rdfs:domain :CubeSensorValue ;
+      rdfs:label "Cube-Sensorzustand"@de , "cube state"@en ;
+      rdfs:range :CubeSensorState .
+
+# classes
+
+:SensorValue
+      a       owl:Class ;
+# sensor values have to have at least an associated sensor (and only one at that)
+      rdfs:subClassOf
+              [ a owl:Restriction ;
+                owl:onProperty :sensorJid ;
+# TODO: can we construct a restriction to Jabber IDs?
+#                owl:allValuesFrom 
+                owl:minCardinality "1"^^<http://www.w3.org/2001/XMLSchema#int> ;
+                owl:maxCardinality "1"^^<http://www.w3.org/2001/XMLSchema#int>
+              ] ;
+# TODO: sensor values may be targeted on an user or a room
+      rdfs:label "Sensor Value"@en, "Sensorwert"@de .
+
+:MikeSensorValue
+      a       owl:Class ;
+      rdfs:subClassOf :SensorValue ;
+      rdfs:label "Mike Sensor Value"@en , "Mike-Sensorwert"@de ;
+      mate:primaryKey :JidKey .
+
+:CubeSensorValue
+      a       owl:Class ;
+      rdfs:subClassOf :SensorValue ;
+      rdfs:label "Cube Sensor Value"@en , "Cube-Sensorwert"@de ;
+      mate:primaryKey :JidKey .
+
+:DesktopSensorValue
+      a       owl:Class ;
+      rdfs:subClassOf :SensorValue ;
+      rdfs:label "Desktop Sensor Value"@en , "Desktopsensorwert"@de ;
+      mate:primaryKey :JidKey .
+
+:DoorSensorValue
+      a       owl:Class ;
+      rdfs:subClassOf :SensorValue ;
+      rdfs:label "Door Sensor Value"@en , "Türsensorwert"@de ;
+      mate:primaryKey :JidKey .
+
+# enumeration classes
+
+:DesktopSensorFrequency
+      a       owl:Class ;
+      rdfs:label "Desktop Sensor Frequency"@en , "Desktopsensorfrequenz"@de ;
+      owl:oneOf (:inactive :active :very_active) .
+
+:DesktopSensorProgram
+      a       owl:Class ;
+      rdfs:label "Desktopsensorprogramm"@de , "Desktop Sensor Program"@en ;
+      owl:oneOf (:unknown :text :browser) .
+
+:CubeSensorState
+      a       owl:Class ;
+      rdfs:label "Cube-Sensorzustand"@de , "Cube Sensor State"@en ;
+      owl:oneOf (:shortBreak :longBreak :reading :writing :meeting) .
+
+# keys
+
+:JidKey
+      a       mate:PrimaryKey ;
+      rdf:first :jid ;
+      rdf:rest () .
