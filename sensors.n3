@@ -16,48 +16,6 @@
       rdfs:label "Türsensorzustand"@de , "Door Sensor State"@en ;
       owl:oneOf (:uninterruptible :interruptible :maybeInterruptible) .
 
-# :meeting
-#       a       owl:Thing .
-
-# :reading
-#       a       owl:Thing .
-
-# :uninterruptible
-#       a       owl:Thing .
-
-# :longBreak
-#       a       owl:Thing .
-
-# :unknown
-#       a       owl:Thing .
-
-# :inactive
-#       a       owl:Thing .
-
-# :active
-#       a       owl:Thing .
-
-# :maybeInterruptible
-#       a       owl:Thing .
-
-# :browser
-#       a       owl:Thing .
-
-# :text
-#       a       owl:Thing .
-
-# :very_active
-#       a       owl:Thing .
-
-# :shortBreak
-#       a       owl:Thing .
-
-# :writing
-#       a       owl:Thing .
-
-# :interruptible
-#       a       owl:Thing .
-
 # object properties
 
 :sensorJid
@@ -70,9 +28,6 @@
 :userJid
       a       owl:ObjectProperty ;
       rdfs:domain :SensorValue ;
-              # [ a       owl:Class ;
-              #   owl:unionOf (:MikeSensorValue :DesktopSensorValue :CubeSensorValue :DoorSensorValue)
-              # ] ;
       rdfs:label "Benutzer-JID"@de , "user JID"@en ;
       rdfs:comment "Jabber ID of the user this value is meant for."@en ,
                    "Jabber-ID des Benutzers für den dieser Wert bestimmt ist."@de .
