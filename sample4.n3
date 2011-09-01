@@ -10,10 +10,14 @@
 # we don't have an ontology yet, so this is just a mockup basically
 
 # rdf:type / a is the marker
-[] a :AvailabilityResult ;
-   :jid "olof@jabber.imis.uni-luebeck.de" ;
-   :available "false"^^xsd:boolean .
+[] a :DesktopSensorValue ;
+   :desktopSensorFrequency :inactive ;
+   :desktopSensorProgram :browser ;
+   :userJID <jabber:olof@jabber.imis.uni-luebeck.de> ;
+   :sensorJID <jabber:sensors1@localhost> .
 
-[] a :AvailabilityResult ;
-   :jid "jörg@jabber.imis.uni-luebeck.de" ;
-   :available "true"^^xsd:boolean .
+[] a :DesktopSensorValue ;
+   :desktopSensorFrequency :active ;
+   :desktopSensorProgram :text ;
+   :userJID <jabber:jörg@jabber.imis.uni-luebeck.de> ;
+   :sensorJID <jabber:sensors2@localhost> .

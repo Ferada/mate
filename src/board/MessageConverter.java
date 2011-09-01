@@ -3,11 +3,6 @@ package board;
 import org.slf4j.*;
 
 import com.hp.hpl.jena.rdf.model.*;
-
-// import com.hp.hpl.jena.vocabulary.RDF;
-// import com.hp.hpl.jena.vocabulary.XSD;
-// import com.hp.hpl.jena.vocabulary.OWL;
-
 import com.hp.hpl.jena.vocabulary.*;
 
 import board.vocabulary.*;
@@ -103,10 +98,20 @@ public class MessageConverter {
       return null;
     }
 
+    String sensorJid = status.getSubjectDevice ();
+    int index = sensorJid.indexOf ('/');
+    if (index != -1)
+      sensorJid = sensorJid.substring (0, index);
+
     model.add (model.createStatement (marker,
-				      Sensors.property ("jid"),
-				      //request.getRequestObject ()));
+				      Sensors.property ("sensorJid"),
+				      ResourceFactory.createResource (sensorJid)));
+
+    model.add (model.createStatement (marker,
+				      Sensors.property ("userJid"),
 				      ResourceFactory.createResource (request.getRequestObject ())));
+
+   /* TODO: what about rooms? */
 
     logger.trace ("model = " + Whiteboard.writeToString (model, "N3"));
 

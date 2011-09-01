@@ -8,15 +8,24 @@
 @prefix : <http://www.imis.uni-luebeck.de/mate/sensors#> .
 
 # this is a sample sensor value
-# we don't have an ontology yet, so this is just a mockup basically
 
 [] :foo "bar" .
 
 # rdf:type / a is the marker
-[] a :AvailabilitySensorValue ;
-   :jid "olof@jabber.imis.uni-luebeck.de" ;
-   :available "true"^^xsd:boolean .
+[] a :DesktopSensorValue ;
+   :desktopSensorFrequency :active ;
+   :desktopSensorProgram :text ;
+   :userJID <jabber:olof@jabber.imis.uni-luebeck.de> ;
+   :sensorJID <jabber:sensors1@localhost> .
 
-[] a :AvailabilitySensorValue ;
-   :jid "jörg@jabber.imis.uni-luebeck.de" ;
-   :available "false"^^xsd:boolean .
+[] a :DesktopSensorValue ;
+   :desktopSensorFrequency :active ;
+   :desktopSensorProgram :browser ;
+   :userJID <jabber:jörg@jabber.imis.uni-luebeck.de> ;
+   :sensorJID <jabber:sensors2@localhost> .
+
+[] a :DoorSensorValue ;
+   :doorSensorState :uninterruptible ;
+   :userJID <jabber:christian@jabber.imis.uni-luebeck.de> ;
+   :roomID <urn:imis:aroom> ;
+   :sensorJID <jabber:sensors3@localhost> .

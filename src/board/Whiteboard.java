@@ -13,6 +13,7 @@ import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.graph.compose.*;
 
 import com.hp.hpl.jena.sparql.core.*;
+import com.hp.hpl.jena.sparql.expr.*;
 import com.hp.hpl.jena.sparql.util.*;
 import com.hp.hpl.jena.sparql.syntax.*;
 import com.hp.hpl.jena.sparql.modify.request.*;
@@ -202,8 +203,6 @@ public class Whiteboard implements Board, Runnable {
 
     mateReasoner = reasoner.bindSchema (mateOntology.model);
     sensorReasoner = reasoner.bindSchema (sensorOntology.model);
-
-    
   }
 
   /**
@@ -419,24 +418,50 @@ public class Whiteboard implements Board, Runnable {
   private List<Triple> primaryKeyCheckTriples (Var var, Resource marker, MateClass klass) {
     List<Triple> result = new ArrayList<Triple> ();
 
+    boolean hadProperties = false;
+
     for (Property property : klass.primaryKey) {
-      Statement value = marker.getRequiredProperty (property);
-      result.add (new Triple (var,
-			      Node.createURI (property.getURI ()),
-			      value.getObject ().asNode ()));
+      Statement value = marker.getProperty (property);
+      if (value != null) {
+	result.add (new Triple (var,
+				Node.createURI (property.getURI ()),
+				value.getObject ().asNode ()));
+	hadProperties = true;
+      }
     }
+
+    if (!hadProperties)
+      throw new RuntimeException ("object didn't have at least one primary key property");
 
     return result;
   }
 
-  private void addPrimaryKeyChecks (Var var, Resource marker, MateClass klass, PathBlock pattern) {
+  private void addFilters (Var var, Resource marker, MateClass klass, ElementGroup group) {
+    for (Property property : klass.primaryKey) {
+      Statement value = marker.getProperty (property);
+      if (value == null) {
+	logger.trace ("new filter for property " + property.getURI ());
+	ElementGroup element = new ElementGroup ();
+	ElementPathBlock pathBlock = new ElementPathBlock ();
+	pathBlock.addTriplePath (new TriplePath (new Triple (var, Node.createURI (property.getURI ()), Var.ANON)));
+	element.addElement (pathBlock);
+	Expr expr = new E_NotExists (element);
+	ElementFilter filter = new ElementFilter (expr);
+	group.addElement (filter);
+      }
+    }
+  }
+
+  private void addPrimaryKeyChecks (Var var, Resource marker, MateClass klass, PathBlock pattern, ElementGroup group) {
     for (Triple triple : primaryKeyCheckTriples (var, marker, klass))
       pattern.add (new TriplePath (triple));
+    addFilters (var, marker, klass, group);
   }
 
   private void addPrimaryKeyChecks (Var var, Resource marker, MateClass klass, ElementGroup group) {
     for (Triple triple : primaryKeyCheckTriples (var, marker, klass))
       group.addTriplePattern (triple);
+    addFilters (var, marker, klass, group);
   }
 
   public List<Model> matching (Model test, Resource marker, MateClass klass) {
@@ -458,7 +483,7 @@ public class Whiteboard implements Board, Runnable {
     Resource type = klass.base.asResource ();
     pattern.add (new TriplePath (new Triple (var_marker, RDF.Nodes.type, type.asNode ())));
 
-    addPrimaryKeyChecks (Var.alloc ("marker"), marker, klass, pattern);
+    addPrimaryKeyChecks (Var.alloc ("marker"), marker, klass, pattern, group);
 
     logger.trace ("matching query = " + query);
 
@@ -573,12 +598,15 @@ public class Whiteboard implements Board, Runnable {
 					    type.asNode ()));
 
 	/* for every resource in the primary key, check whether it has
-	   the given value: "?s resource value" */
+	   the given value: "?s resource value", or, if there is no value,
+	   adds an filter expression "FILTER NOT EXISTS { ?s resource ?_ }".
+	   this way, objects with (intentionally) missing parts from the
+	   primary key are indexed by their remaining properties */
 	try {
 	  addPrimaryKeyChecks (var_s, markerResource, klass, group);
 	}
-	catch (PropertyNotFoundException e) {
-	  logger.error ("model didn't conform to its schema, missing property: " + e + ", skipping this update");
+	catch (Exception e) {
+	  logger.error ("model didn't conform to its schema: " + e + ", skipping this update");
 	  continue;
 	}
 
@@ -598,6 +626,8 @@ public class Whiteboard implements Board, Runnable {
 
 	/* get the closure, i.e. reachable statements */
 	Model closure = Closure.closure (markerResource, true);
+
+	logger.trace ("for model = " + writeToString (closure, "N3"));
 
 	boolean result = true;
 	if (sensorUpdate)
@@ -690,7 +720,7 @@ public class Whiteboard implements Board, Runnable {
     Var var_entry = Var.alloc ("entry");
     /* add "?entry mate:historyType ?type", but more readable than with initial bindings */
     pattern.add (new TriplePath (new Triple (var_entry, Node.createURI (Mate.historyType.getURI ()), typeResource.asNode ())));
-    addPrimaryKeyChecks (var_entry, markerResource, klass, pattern);
+    addPrimaryKeyChecks (var_entry, markerResource, klass, pattern, group);
 
     logger.trace ("matching query = " + query);
 
@@ -738,9 +768,10 @@ public class Whiteboard implements Board, Runnable {
 	
 	for (Property property : klass.primaryKey) {
 	  Statement value = markerResource.getProperty (property);
-	  historyValues.add (historyValues.createStatement (entry,
-							    property,
-							    value.getObject ()));
+	  if (value != null)
+	    historyValues.add (historyValues.createStatement (entry,
+							      property,
+							      value.getObject ()));
 	}
 
 	list = historyValues.createResource ();

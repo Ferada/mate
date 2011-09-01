@@ -34,8 +34,10 @@ public class MateClass {
     List<Resource> resources = Whiteboard.convertRdfList (statement.getResource ());
     List<Property> properties = new ArrayList<Property> ();
 
-    for (Resource resource : resources)
+    for (Resource resource : resources) {
+      logger.trace ("resource = " + resource.getURI ());
       properties.add (ResourceFactory.createProperty (resource.getURI ()));
+    }
 
     return new MateClass (typeClass, properties);
   }
