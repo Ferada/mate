@@ -574,6 +574,11 @@ public class Whiteboard implements Board, Runnable {
 	  continue;
 	}
 
+	if (sensorUpdate && (markerResource.getProperty (Sensors.property ("sensorJID")) == null)) {
+	  logger.error ("sensor value is missing 'sensorJID' property, skipping this update");
+	  continue;
+	}
+
 	/* query the sensor model for matching triples,
 	   remove every other connected triple from that node */
 
