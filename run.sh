@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# runs the specified main method with class-path and configuration file
+# set up
+
 if [ -z $MAIN ]; then
   MAIN=hub.AwarenessHub
 fi
