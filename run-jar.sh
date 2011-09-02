@@ -12,5 +12,5 @@ OPTS=-Dlog4j.configuration=log4j.properties
 if [ -z $MAIN ]; then
   exec java $OPTS -jar $JAR $*
 else
-  exec java $OPTS -cp mate.jar $MAIN $*
+  exec java $OPTS -cp $JAR $MAIN $*
 fi
