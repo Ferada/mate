@@ -34,3 +34,15 @@
 
 (defun get-local-name (resource)
   (jcall (jmethod "com.hp.hpl.jena.rdf.model.Resource" "getLocalName") resource))
+
+(defun make-uri (string)
+  (let ((uri (jnew (jconstructor "java.net.URI" (jclass "java.lang.String")) string)))
+    (unless (jcall (jmethod "java.net.URI" "getScheme") uri)
+      (setf uri (jnew (jconstructor "java.net.URI"
+				    (jclass "java.lang.String")
+				    (jclass "java.lang.String")
+				    (jclass "java.lang.String"))
+		      "xmpp"
+		      (jcall (jmethod "java.net.URI" "getSchemeSpecificPart") uri)
+		      (jcall (jmethod "java.net.URI" "getFragment") uri))))
+    (values uri)))
