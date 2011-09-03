@@ -42,7 +42,7 @@ public interface Board {
    * Merges the given sensor values.  Only affects the sensor values
    * model.
    */
-  public void postSensorUpdate (Client client, Model model);
+  public void postSensorUpdate (Model model);
 
   /**
    * Returns a pre-configured execution object.  It is the callers

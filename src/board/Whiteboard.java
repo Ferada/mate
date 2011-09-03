@@ -261,8 +261,8 @@ public class Whiteboard implements Board, Runnable {
     board.registerClient (client);
     board.registerClient (reasoner);
 
-    board.postSensorUpdate (client, sample1);
-    board.postSensorUpdate (client, sample2);
+    board.postSensorUpdate (sample1);
+    board.postSensorUpdate (sample2);
 
     LoggingCombiner combiner = new LoggingCombiner ();
     board.registerCombiner (Mate.resource ("AvailabilityResult").getURI (), combiner);
@@ -519,23 +519,20 @@ public class Whiteboard implements Board, Runnable {
 
     logger.trace ("private values =");
     for (Client client : clients) {
-      logger.trace ("Client " + client.getName () + ", <" + client + ">:");
+      logger.trace ("Client " + client + ", <" + client + ">:");
       logger.trace (writeToString (getPrivateModel (client)));
       logger.trace ("---");
     }
     logger.trace ("===");
   }
 
-  public void postSensorUpdate (Client poster, Model model) {
+  public void postSensorUpdate (Model model) {
     if (!isConsistent (sensorOntology, sensorReasoner, model)) {
       logger.warn ("update isn't consistent with respect to the sensor ontology, discarding");
       return;
     }
 
-    if (poster instanceof board.Reasoner)
-      logger.warn ("a reasoner probably shouldn't post sensor value updates");
-
-    postGenericUpdate (sensorOntology, poster, model, true, false);
+    postGenericUpdate (sensorOntology, null, model, true, false);
 
     logger.trace ("sensor values =");
     logger.trace (writeToString (sensorValues));
@@ -545,6 +542,8 @@ public class Whiteboard implements Board, Runnable {
   /**
    * Does the boring extraction of proper values from the update model
    * in a generic way for both world and sensor updates.
+   * @param poster The client who posted the update model.  If sensorUpdate
+   * is true, this is disregarded.
    */
   private void postGenericUpdate (MateOntology ontology, Client poster, Model model, boolean sensorUpdate, boolean recursive) {
     /* merge the posted model with the sensor values model, according to the
@@ -636,7 +635,7 @@ public class Whiteboard implements Board, Runnable {
 
 	boolean result = true;
 	if (sensorUpdate)
-	  sensorUpdateInner (closure, poster, typeResource, markerResource, typeUri, klass, deleteRequest);
+	  sensorUpdateInner (closure, typeResource, markerResource, typeUri, klass, deleteRequest);
 	else
 	  /* this might combine stuff and handle it itself, so check the return value */
 	  result = worldUpdateInner (closure, poster, typeResource, markerResource, typeUri, klass, deleteRequest, recursive);
@@ -648,7 +647,14 @@ public class Whiteboard implements Board, Runnable {
 	  /* submit the updated sensor datum to matching clients */
 	  for (Client client : clients) {
 	    // TODO: check whether this client actually wants this message
-	    client.postUpdate (this, closure);
+	    /* beware of faulty clients */
+	    try {
+	      client.postUpdate (this, closure, klass, markerResource);
+	    }
+	    catch (Exception e) {
+	      logger.error ("faulty client threw an exception: " + e);
+	      logger.error (writeToString (e));
+	    }
 	  }
 	}
       }
@@ -663,7 +669,7 @@ public class Whiteboard implements Board, Runnable {
    * a sensor update.  It simply adds the closure into the sensor value
    * model.
    */
-  private void sensorUpdateInner (Model closure, Client poster, Resource typeResource,
+  private void sensorUpdateInner (Model closure, Resource typeResource,
 				 Resource markerResource, String typeUri, MateClass klass,
 				 UpdateRequest deleteRequest) {
     UpdateProcessor deleteExec = UpdateExecutionFactory.create (deleteRequest, sensorStore);
@@ -685,6 +691,10 @@ public class Whiteboard implements Board, Runnable {
 				    Resource markerResource, String typeUri, MateClass klass,
 				    UpdateRequest deleteRequest, boolean recursive) {
     if (!recursive) {
+      /* delete old stuff from the private database */
+      UpdateProcessor deleteExec = UpdateExecutionFactory.create (deleteRequest, getPrivateStore (poster));
+      deleteExec.execute ();
+
       /* insert the updated values into the private database */
       getPrivateModel (poster).add (closure);
 
@@ -837,6 +847,12 @@ public class Whiteboard implements Board, Runnable {
     return writer.toString ();
   }
 
+  public static String writeToString (Throwable e) {
+    StringWriter writer = new StringWriter ();
+    e.printStackTrace (new PrintWriter (writer));
+    return writer.toString ();
+  }
+
   /**
    * Takes a {@link DeviceMateMessage} and handles it depending on its
    * sub-type (i.e. we only do stuff on {@link StatusMessage} objects).
@@ -874,6 +890,82 @@ public class Whiteboard implements Board, Runnable {
        useless regarding combining update values ...
        maybe get it from a hashtable and generate them on demand? */
     if (model != null)
-      postSensorUpdate (null, model);
+      postSensorUpdate (model);
+  }
+
+  public String toString () {
+    return "Whiteboard";
+  }
+
+  public static URI parseXmppUri (String string) {
+    try {
+      URI uri = new URI (string);
+      String scheme = uri.getScheme ();
+      if (scheme == null) {
+	uri = new URI ("xmpp", uri.getSchemeSpecificPart (), uri.getFragment ());
+      }
+      else if (!scheme.equals ("xmpp"))
+	throw new URISyntaxException (string, "scheme isn't 'xmpp'");
+
+      /* TODO: it'd be nice to have an actual XMPPURI class so we can do
+	 more stuff on it, but that'll have to wait */
+      // String nodeid = null, host = null, resid = null, query = null, fragment = null;
+
+      // String split = uri.getSchemeSpecificPart ();
+      // String parts[];
+
+      // parts = split.split ("#");
+
+      // if (parts.length == 2) {
+      // 	fragment = parts[1];
+      // 	split = parts[0];
+      // }
+      // else if (parts.length > 2)
+      // 	throw new URISyntaxException (string, "more than one '#' separator");
+
+      // parts = split.split ("\\?");
+
+      // if (parts.length == 2) {
+      // 	query = parts[1];
+      // 	split = parts[0];
+      // }
+      // else if (parts.length > 2)
+      // 	throw new URISyntaxException (string, "more than one '?' separator");      
+
+      // parts = split.split ("/");
+
+      // if (parts.length == 2) {
+      // 	resid = parts[1];
+      // 	split = parts[0];
+      // }
+      // else if (parts.length > 2)
+      // 	throw new URISyntaxException (string, "more than one '/' separator");
+
+      // parts = split.split ("@");
+
+      // if (parts.length == 1)
+      // 	host = parts[0];
+      // else if (parts.length == 2) {
+      // 	nodeid = parts[0];
+      // 	host = parts[1];
+      // }
+      // else
+      // 	throw new URISyntaxException (string, "more than one '@' separator");
+      
+      // logger.info ("scheme = " + scheme);
+      // logger.info ("nodeid = " + nodeid);
+      // logger.info ("host = " + host);
+      // logger.info ("resid = " + resid);
+      // logger.info ("query = " + query);
+      // logger.info ("fragment = " + fragment);
+      
+      // return new URI (scheme, nodeid, host, -1, (resid == null) ? null : ("/" + resid), query, fragment);
+
+      return uri;
+    }
+    catch (URISyntaxException e) {
+      System.out.println ("couldn't parse URI '" + string + "': " + e);
+      throw new RuntimeException (e);
+    }
   }
 }

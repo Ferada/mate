@@ -13,10 +13,17 @@ public final class Sensors {
   public static final String uri = "http://www.imis.uni-luebeck.de/mate/sensors#";
 
   /**
+   * Returns a new URI of a resource in this namespace with a given name.
+   */
+  public static String resourceString (String name) {
+    return uri + name;
+  }
+
+  /**
    * Returns a new resource in this namespace with a given name.
    */
   public static Resource resource (String name) {
-    return ResourceFactory.createResource (uri + name);
+    return ResourceFactory.createResource (resourceString (name));
   }
 
   /**

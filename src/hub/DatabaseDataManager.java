@@ -97,26 +97,47 @@ public class DatabaseDataManager extends DataManager {
 	/**
 	 * Erzeugt einen neuen DatabaseDataManager.
 	 */
-	private DatabaseDataManager(String jdbcDriver, String jdbcString, String user, String password) {
+	private DatabaseDataManager(String jdbcDriver, String jdbcString,
+				    String user, String password)
+		throws SQLException, ClassNotFoundException
+	{
 		try {
 			Class.forName(jdbcDriver);
 			// TODO: URL, User und Passwort anpassen
 			con = DriverManager.getConnection(jdbcString, user, password);
 			//con.toString();
+			logger.info ("connected to database");
 		} catch (SQLException e) {
 		    // handle any errors
 		    logger.error("SQLException: " + e.getMessage());
 		    logger.error("SQLState: " + e.getSQLState());
 		    logger.error("VendorError: " + e.getErrorCode());
+		    throw e;
 		} catch (ClassNotFoundException e) {
 			logger.error("couldn't find class: " + e);
+			throw e;
+		}
+	}
+
+	public void shutdown() {
+		try {
+			con.close ();
+			logger.info ("disconnected from database");
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
 		}
 	}
 	
 	/**
 	 * Gibt eine DatabaseDataManager-Instanz zurück.
 	 */
-	static DatabaseDataManager createDataManager(String jdbcDriver, String jdbcString, String user, String pass) {
+	static DatabaseDataManager createDataManager(String jdbcDriver,
+						     String jdbcString,
+						     String user,
+						     String pass)
+		throws SQLException, ClassNotFoundException
+	{
 		if(ddm == null) {
 			ddm = new DatabaseDataManager(jdbcDriver,jdbcString,user,pass);
 		}	

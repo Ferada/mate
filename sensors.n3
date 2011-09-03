@@ -59,18 +59,18 @@
 :mikeSensorSpeaker
       a       owl:ObjectProperty ;
       rdfs:domain :MikeSensorValue ;
-      rdfs:label "Mike-Sensorsprecher"@en , "Mike Sensor Speaker"@en .
+      rdfs:label "Mike-Sensorsprecher"@en , "mike sensor speaker"@en .
 
 :cubeSensorState
       a       owl:ObjectProperty ;
       rdfs:domain :CubeSensorValue ;
-      rdfs:label "Cube-Sensorzustand"@de , "cube state"@en ;
+      rdfs:label "Cube-Sensorzustand"@de , "cube sensor state"@en ;
       rdfs:range :CubeSensorState .
 
 :doorSensorState
       a       owl:ObjectProperty ;
       rdfs:domain :DoorSensorState ;
-      
+      rdfs:label "Türsensorzustand"@de , "door sensor state"@en ;
       rdfs:range :DoorSensorState .
 
 # classes
@@ -104,32 +104,32 @@
       a       owl:Class ;
       rdfs:subClassOf :SensorValue ;
       rdfs:label "Mike Sensor Value"@en , "Mike-Sensorwert"@de ;
-      mate:primaryKey (:userJID) .
+      mate:primaryKey (:sensorJID :userJID) .
 
 :CubeSensorValue
       a       owl:Class ;
       rdfs:subClassOf :SensorValue ;
       rdfs:label "Cube Sensor Value"@en , "Cube-Sensorwert"@de ;
-      mate:primaryKey (:userJID) .
+      mate:primaryKey (:sensorJID :userJID) .
 
 :DesktopSensorValue
       a       owl:Class ;
       rdfs:subClassOf :SensorValue ;
       rdfs:label "Desktop Sensor Value"@en , "Desktopsensorwert"@de ;
-      mate:primaryKey (:userJID) .
+      mate:primaryKey (:sensorJID :userJID) .
 
 :DoorSensorValue
       a       owl:Class ;
       rdfs:subClassOf :SensorValue ;
       rdfs:label "Door Sensor Value"@en , "Türsensorwert"@de ;
-      mate:primaryKey (:userJID :roomID) .
+      mate:primaryKey (:sensorJID :userJID :roomID) .
 
 # enumeration classes
 
 :DesktopSensorFrequency
       a       owl:Class ;
       rdfs:label "Desktop Sensor Frequency"@en , "Desktopsensorfrequenz"@de ;
-      owl:oneOf (:inactive :active :very_active) .
+      owl:oneOf (:inactive :active :veryActive) .
 
 :DesktopSensorProgram
       a       owl:Class ;

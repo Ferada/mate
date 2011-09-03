@@ -1,5 +1,7 @@
 package comm;
 
+import org.slf4j.*;
+
 import java.util.ArrayList;
 
 import org.jivesoftware.smack.PacketListener;
@@ -14,6 +16,7 @@ import org.jivesoftware.smack.packet.Packet;
  * Mate-Komponenten.
  */
 public class MateConnection extends XMPPConnection implements PacketListener {
+	private static Logger logger = LoggerFactory.getLogger (MateConnection.class);
 
 	/**
 	 * Registrierte MateListener
@@ -44,27 +47,26 @@ public class MateConnection extends XMPPConnection implements PacketListener {
 	}
 
 	@Override
-	public void connect() {
-		try {
-			super.connect();
-			addPacketListener(this, null);
-		} catch (XMPPException e) {
-			e.printStackTrace();
-		}
+	public void connect() throws XMPPException {
+		super.connect();
+		addPacketListener(this, null);
+		logger.info ("connected to XMPP server");
+	}
+
+	public void disconnect() {
+		super.disconnect();
+		logger.info ("disconnected from XMPP server");
 	}
 
 	/**
 	 * 
 	 */
 	@Override
-	public void login(String username, String password) {
+	public void login(String username, String password) throws XMPPException {
 		SASLAuthentication.supportSASLMechanism("DIGEST-MD5", 0);
 		SASLAuthentication.unregisterSASLMechanism("PLAIN");
-		try {
-			super.login(username, password);
-		} catch (XMPPException e) {
-			e.printStackTrace();
-		}
+		super.login(username, password);
+		logger.info ("logged in on XMPP server");
 	}
 
 	/**

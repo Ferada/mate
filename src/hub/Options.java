@@ -103,13 +103,14 @@ public class Options {
   }
 
   private String set (ArgumentAcceptingOptionSpec<String> spec) {
+    String name = map.get (spec);
     if (!set.has (spec)) {
-      String name = map.get (spec);
       String value = properties.getProperty (name);
-      logger.trace (name + " = " + value);
       spec.defaultsTo (value);
     }
-    return set.valueOf (spec);
+    String result = set.valueOf (spec);
+    logger.trace (name + " = " + result);
+    return result;
   }
 
   private void parseArguments (String args[]) throws Exception {

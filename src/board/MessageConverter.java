@@ -5,11 +5,14 @@ import org.slf4j.*;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.*;
 
+import static board.Whiteboard.parseXmppUri;
+
 import board.vocabulary.*;
 
 import comm.*;
 
 import java.util.*;
+import java.net.*;
 
 /**
  * Converts a {@link DeviceMateMessage}, or rather
@@ -71,45 +74,56 @@ public class MessageConverter {
 
       if (!entities.containsKey ("doorstate"))
 	logger.warn ("missing entity 'doorstate'");
-      else
+      else {
+	String string = entities.get ("doorstate").getValue ();
+	if (string.equals ("0"))
+	  string = "uninterruptible";
+	else if (string.equals ("1"))
+	  string = "interruptible";
+	else if (string.equals ("2"))
+	  string = "mayBeinterruptible";
+	else
+	  logger.warn ("couldn't parse door state, using unparsed '" + string + "'");
+	/* yes, we have to convert here, but this really should go away */
 	model.add (model.createStatement (marker, 
 					  Sensors.property ("doorSensorState"),
-					  Sensors.resource (entities.get ("doorstate").getValue ())));
+					  Sensors.resource (string)));
+      }
     }
     else if (subject.equals ("mike")) {
       model.add (model.createStatement (marker, RDF.type, Sensors.resource ("MikeSensorValue")));
+
+      /* TODO: how about enforcing the format for the speaker values? i.e. literal vs. resource */
 
       if (!entities.containsKey ("speaker1"))
 	logger.warn ("missing entity 'speaker1'");
       else
 	model.add (model.createStatement (marker, 
 					  Sensors.property ("mikeSensorSpeaker"),
-					  Sensors.resource (entities.get ("speaker1").getValue ())));
+					  ResourceFactory.createResource (entities.get ("speaker1").getValue ())));
 
       if (!entities.containsKey ("speaker2"))
-	logger.warn ("missing entity 'doorstate'");
+	logger.warn ("missing entity 'speaker2'");
       else
 	model.add (model.createStatement (marker, 
 					  Sensors.property ("mikeSensorSpeaker"),
-					  Sensors.resource (entities.get ("speaker2").getValue ())));
+					  ResourceFactory.createResource (entities.get ("speaker2").getValue ())));
     }
     else {
       logger.warn ("unknown subject " + subject + ", ignoring");
       return null;
     }
 
-    String sensorJid = status.getSubjectDevice ();
-    int index = sensorJid.indexOf ('/');
-    if (index != -1)
-      sensorJid = sensorJid.substring (0, index);
+    URI sensorURI = parseXmppUri (status.getSubjectDevice ());
+    URI userURI = parseXmppUri (request.getRequestObject ());
 
     model.add (model.createStatement (marker,
-				      Sensors.property ("sensorJid"),
-				      ResourceFactory.createResource (sensorJid)));
+				      Sensors.property ("sensorJID"),
+				      ResourceFactory.createResource (sensorURI.toString ())));
 
     model.add (model.createStatement (marker,
-				      Sensors.property ("userJid"),
-				      ResourceFactory.createResource (request.getRequestObject ())));
+				      Sensors.property ("userJID"),
+				      ResourceFactory.createResource (userURI.toString ())));
 
    /* TODO: what about rooms? */
 

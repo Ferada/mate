@@ -54,4 +54,45 @@ public class MateClass {
     else
       return "MateClass<" + label + ">";
   }
+
+  /**
+   * Returns true if the argument relates to the same entity as the object,
+   * i.e. their URIs are the same.
+   * @see Resource#hasURI
+   */
+  public boolean hasURI (Resource resource) {
+    return hasURI (resource.getURI ());
+  }
+
+  /**
+   * Returns true if the object has the given URI.
+   * @see Resource#hasURI
+   */
+  public boolean hasURI (String string) {
+    return base.hasURI (string);
+  }
+
+  /**
+   * Two objects of this class are equal if their {@link OntClass} base
+   * objects are considered equal.
+   */
+  public boolean equals (Object object) {
+    if (this == object)
+      return true;
+
+    if (object instanceof MateClass) {
+      MateClass klass = (MateClass) object;
+
+      return base.equals (klass.base);
+    }
+
+    return false;
+  }
+
+  public int hashCode () {
+    /* this is allowed c.f. Object#hashCode, i.e. if we're equal, then
+       this returns the same hash for both objects and if we aren't, it
+       doesn't matter */
+    return base.hashCode ();
+  }
 }

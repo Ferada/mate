@@ -69,21 +69,23 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 		
 		// Ressourcen initialisieren
 		dataManager		= DatabaseDataManager.createDataManager(jdbcDriver,dbUrl,dbUsername,dbPassword);
-		logger.info ("connected to database");
+
+		connection.connect();
+		// Einloggen
+		connection.login(hubName, hubPassword);
 
 		generator 		= new Generator(new SMSGateway(receiveSMS), new MailGateway(receiveMail), connection);
 		contextAnalyzer = new ContextAnalyzer(fileTransferManager, dataManager);
 		syntaxAnalyzer 	= new SyntaxAnalyzer();
 
 		whiteboard = new Whiteboard();
-		whiteboard.registerClient(new LoggingClient());
-
-		connection.connect();
-		logger.info ("connected to XMPP server");
-		// Einloggen
-		connection.login(hubName, hubPassword);
-		logger.info ("logged in on XMPP server");
-		
+		Client client1 = new TestSensorReasoner(dataManager.getUserData ());
+		Client client2 = new TestSensorReasoner(dataManager.getUserData ());
+		client1.setName ("1");
+		client1.setName ("2");
+		whiteboard.registerClient(client1);
+		whiteboard.registerClient(client2);
+	
 		// Manager für den XMPP-Dateitransfer initialisieren
 		fileTransferManager = new FileTransferManager(connection);
 	    fileTransferManager.addFileTransferListener(this);
@@ -96,6 +98,10 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 	public void run() {
 		// Schleife die mit run=false unterbrochen werden kann
 		while (run) {
+			if (!connection.isConnected ()) {
+				run = false;
+				return;
+			}
 			try {
 				Thread.sleep(250);
 			} catch (InterruptedException e) {
@@ -106,10 +112,10 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 
 	public void shutdown() {
 		logger.info ("shutdown");
-		if (connection.isConnected ()) {
+		if (connection.isConnected ())
 			connection.disconnect();
-			logger.info ("disconnected from XMPP server");
-		}
+
+		dataManager.shutdown ();
 	}
 	
 	@Override

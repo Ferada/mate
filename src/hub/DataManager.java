@@ -13,7 +13,8 @@ import comm.ContactData;
  * MATe-System dar.
  */
 abstract class DataManager {
-	
+	abstract void shutdown();
+
 	/**
 	 * Liefert einen Benutzer anhand einer seiner JIDs.
 	 * 

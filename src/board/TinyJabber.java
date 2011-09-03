@@ -2,8 +2,10 @@ package board;
 
 import java.io.*;
 import java.util.*;
+import java.net.*;
 
 import static java.util.Arrays.asList;
+import static board.Whiteboard.parseXmppUri;
 
 import joptsimple.*;
 
@@ -28,10 +30,10 @@ public final class TinyJabber {
 	  acceptsAll (asList ("p", "xmpp.password"), "Jabber password (for this client)")
 	    .withRequiredArg ().ofType (String.class).defaultsTo ("test");
 
-	  acceptsAll (asList ("to"), "message receiver (probably the hub)")
-	    .withRequiredArg ().ofType (String.class).defaultsTo ("mate@localhost");
-	  acceptsAll (asList ("mate.user"), "MATe user for these sensors")
-	    .withRequiredArg ().ofType (String.class).defaultsTo ("olof@localhost");
+	  acceptsAll (asList ("to"), "message receiver (probably the hub), no scheme prefix")
+	    .withRequiredArg ().ofType (String.class).defaultsTo ("hub@localhost");
+	  acceptsAll (asList ("mate.user"), "MATe user for these sensors; xmpp is optional")
+	    .withRequiredArg ().ofType (String.class).defaultsTo ("xmpp:olof@localhost");
 
 	  acceptsAll (asList ("listen"), "listen for answers")
 	    .withRequiredArg ().ofType (Boolean.class).defaultsTo (Boolean.TRUE);
@@ -73,6 +75,22 @@ public final class TinyJabber {
       }
     }
 
+    URI mateUser = parseXmppUri ((String) options.valueOf ("mate.user"));
+    if (mateUser == null) {
+      help = true;
+      exit = -1;
+    }
+
+    if (type.equals ("mike")) {
+      List<String> tmp = options.nonOptionArguments ();
+      URI uri1 = parseXmppUri (tmp.get (0));
+      URI uri2 = parseXmppUri (tmp.get (1));
+      if (uri1 == null || uri2 == null) {
+	help = true;
+	exit = -1;
+      }
+    }
+
     if (help) {
       String argsString = "[ARGS]...";
       if (!other) {
@@ -90,7 +108,7 @@ public final class TinyJabber {
       if (other || type.equals ("cube"))
 	System.out.println ("cube state is one of break_(long|short), reading, writing, meeting or unknown");
       if (other || type.equals ("door"))
-	System.out.println ("door state is one of 0-2");
+	System.out.println ("door state is one of (un-)interruptible or maybeInterruptible");
       if (other || type.equals ("desktop"))
 	System.out.println ("desktop frequency is one of liest, aktiv, schreibt, schreibt viel or inaktiv\n" +
 			    "desktop program is one of browser or textverarbeitung");
@@ -106,7 +124,7 @@ public final class TinyJabber {
       mate.login ((String) options.valueOf ("xmpp.user"), (String) options.valueOf ("xmpp.password"));
 
       if ((Boolean) options.valueOf ("send"))
-	send (options, mate);
+	send (options, mate, mateUser);
 
       if ((Boolean) options.valueOf ("listen"))
 	listen (mate, options.has ("stdin"));
@@ -155,10 +173,9 @@ public final class TinyJabber {
 	Thread.sleep (5000);
   }
 
-  public static void send (OptionSet options, XMPPConnection mate) throws Exception {
+  public static void send (OptionSet options, XMPPConnection mate, URI user) throws Exception {
     String type = (String) options.valueOf ("type");
     String body = null;
-    String user = (String) options.valueOf ("mate.user");
     List<String> args = options.nonOptionArguments ();
 
     if (options.has ("stdin")) {
@@ -188,36 +205,45 @@ public final class TinyJabber {
       body = makeDoorMessage (user, args.get (0));
 
     Message msg = new Message ();
+    System.out.println ("to = " + options.valueOf ("to"));
     msg.setTo ((String) options.valueOf ("to"));
     msg.setBody (body);
     mate.sendPacket (msg);
   }
 
-  public static String makeNoneMessage (String user) {
+  public static String makeNoneMessage (URI user) {
     return makeStatusMessage (user, "none", null);
   }
 
-  public static String makeUnknownMessage (String user) {
+  public static String makeUnknownMessage (URI user) {
     return makeStatusMessage (user, "unknown", null);
   }
 
-  public static String makeMikeMessage (String user, String speaker1, String speaker2) {
+  public static String makeMikeMessage (URI user, String speaker1, String speaker2) {
     return makeStatusMessage (user, "mike",
-			      entity ("speaker1", speaker1) +
-			      entity ("speaker2", speaker2));
+			      entity ("speaker1", parseXmppUri (speaker1).toString ()) +
+			      entity ("speaker2", parseXmppUri (speaker2).toString ()));
   }
 
-  public static String makeDesktopMessage (String user, String status, String program) {
+  public static String makeDesktopMessage (URI user, String status, String program) {
     return makeStatusMessage (user, "daa",
 			      entity ("frequency", status) + 
 			      entity ("program", program));
   }
 
-  public static String makeCubeMessage (String user, String status) {
+  public static String makeCubeMessage (URI user, String status) {
     return makeStatusMessage (user, "cubus", entity ("cubusstate", status));
   }
 
-  public static String makeDoorMessage (String user, String status) {
+  public static String makeDoorMessage (URI user, String status) {
+    if (status.equals ("uninterruptible"))
+      status = "0";
+    else if (status.equals ("interruptible"))
+      status = "1";
+    else if (status.equals ("maybeInterruptible"))
+      status = "2";
+    else
+      System.out.println ("couldn't parse door status, sending string '" + status + "'");
     return makeStatusMessage (user, "doorlight", entity ("doorstate", status));
   }
 
@@ -228,7 +254,7 @@ public final class TinyJabber {
       return "<entity name='" + name + "'>" + value + "</entity>";
   }
 
-  public static String makeStatusMessage (String user, String subject, String entities) {
+  public static String makeStatusMessage (URI user, String subject, String entities) {
     return "<!DOCTYPE MATe>\n" +
       "<message type='status'>" +
       "<mode>push</mode>" +

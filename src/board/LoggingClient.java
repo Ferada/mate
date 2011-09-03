@@ -11,20 +11,20 @@ import static board.Whiteboard.writeToString;
 /**
  * Example client which simply logs every event.
  */
-public class LoggingClient implements Client {
+public class LoggingClient extends ClientBase {
   private static Logger logger = LoggerFactory.getLogger (LoggingClient.class);
 
-  public String getName () {
-    return "LoggingClient";
+  public String toString () {
+    return "LoggingClient<" + getName () + ">";
   }
 
-  public void postUpdate (Board board, Model model) {
-    logger.info ("got an update");
+  public void postUpdate (Board board, Model model, MateClass klass, Resource marker) {
+    logger.info ("got an update of type " + klass + " starting at " + marker);
     logger.trace (writeToString (model));
     logger.trace ("---");
   }
 
   public void run () {
-    logger.info ("running, sort of");
+    logger.info ("running, sort of ...");
   }
 }
