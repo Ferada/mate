@@ -26,6 +26,8 @@ import comm.Request;
 import comm.ResponseMessage;
 import comm.StatusMessage;
 
+import board.*;
+
 class ContextAnalyzer {	
 	private static Logger logger = LoggerFactory.getLogger (ContextAnalyzer.class);
 	
@@ -43,16 +45,20 @@ class ContextAnalyzer {
 	 * Manager für den XMPP-Datentransfer
 	 */
 	private FileTransferManager fileTransferManager;
-	
-	/**
+
+	private Whiteboard whiteboard;
+
+/**
 	 * Erzeugt einen neuen ContextAnalyzer
 	 */
-	ContextAnalyzer(FileTransferManager ftm, DataManager dm) {
+	ContextAnalyzer(FileTransferManager ftm, DataManager dm, Whiteboard whiteboard) {
 		// DataManager initialisieren
 		dataManager = dm;
 		
 		// FileTransferManager initialisieren
 		fileTransferManager = ftm;
+
+		this.whiteboard = whiteboard;
 		
 		// ReasonerManager initialisieren
 		setupReasonerManager();
@@ -401,7 +407,10 @@ class ContextAnalyzer {
 			if (attribute.isStatusAttibute()) {
 					value = dataManager.getStatus(object,attribute) ;
 			} else {
-					 value = reasonerManager.getStatus(object,attribute);
+				/* whiteboard overrides, normal is fallback */
+				value = FieldConverter.getStatus (whiteboard, object, attribute);
+				if (value == null)
+					value = reasonerManager.getStatus(object,attribute);
 			}
 		}
 		return new FieldData(attribute.toString(), value, isPublic);

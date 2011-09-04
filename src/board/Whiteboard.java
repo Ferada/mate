@@ -134,8 +134,8 @@ public class Whiteboard implements Board, Runnable {
     prefixes.setNsPrefix ("rdf", RDF.getURI ());
     prefixes.setNsPrefix ("xsd", XSD.getURI ());
     prefixes.setNsPrefix ("owl", OWL.getURI ());
-    prefixes.setNsPrefix ("mate", Mate.uri);
-    prefixes.setNsPrefix ("sensors", Sensors.uri);
+    prefixes.setNsPrefix ("mate", Mate.prefix);
+    prefixes.setNsPrefix ("sensors", Sensors.prefix);
     ModelFactory.setDefaultModelPrefixes (prefixes);
 
     worldModel = ModelFactory.createDefaultModel ();
@@ -157,14 +157,14 @@ public class Whiteboard implements Board, Runnable {
        we can actually get them from the URI, we might do so instead of
        having local copies.
        i.e.:
-       FileManager.get ().addAltEntry (Mate.uri..., "localMate.owl");
+       FileManager.get ().addAltEntry (Mate.prefix..., "localMate.owl");
        ...
-       mateOntology = FileManaget.get ().loadModel (Mate.uri ...)
+       mateOntology = FileManaget.get ().loadModel (Mate.prefix ...)
     */
     mateOntology = loadOntology ("mate.n3", "N3");
     /* maps the mateOntology object to the URI, */
     /* TODO: except this doesn't work as expected, i.e. the model is probably copied */
-    OntDocumentManager.getInstance ().addModel (Mate.uri.substring (0, Mate.uri.length () - 1), mateOntology.model, true);
+    OntDocumentManager.getInstance ().addModel (Mate.uri, mateOntology.model, true);
     /* ... so this ontology can properly import its classes.  this creates
        duplicate classes for the mate ontology, but that is no problem atm */
     sensorOntology = loadOntology ("sensors.n3", "N3");
@@ -721,7 +721,7 @@ public class Whiteboard implements Board, Runnable {
    * limit the length of the list, so maybe that should be checked.
    */
   private void updateHistory (Model closure, Resource typeResource, Resource markerResource, MateClass klass) {
-    final String queryString = "PREFIX mate: <" + Mate.uri + "> " +
+    final String queryString = "PREFIX mate: <" + Mate.prefix + "> " +
       "SELECT ?entry WHERE { ?entry a mate:HistoryEntry }";
 
     Query query = QueryFactory.create (queryString);

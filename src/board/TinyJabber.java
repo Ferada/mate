@@ -176,6 +176,8 @@ public final class TinyJabber {
     List<String> args = options.nonOptionArguments ();
 
     if (options.has ("stdin")) {
+      System.out.println ("WARNING: reading from stdin, disregarding all message options");
+
       final char buffer[] = new char[1024];
       StringBuilder builder = new StringBuilder ();
       Reader reader = new InputStreamReader (System.in, "utf-8");
@@ -202,7 +204,6 @@ public final class TinyJabber {
       body = makeDoorMessage (user, args.get (0));
 
     Message msg = new Message ();
-    System.out.println ("to = " + options.valueOf ("to"));
     msg.setTo ((String) options.valueOf ("to"));
     msg.setBody (body);
     mate.sendPacket (msg);

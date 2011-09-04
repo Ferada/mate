@@ -79,7 +79,7 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 		whiteboard.registerClient(client2);
 	
 		generator 		= new Generator(new SMSGateway(receiveSMS), new MailGateway(receiveMail), connection);
-		contextAnalyzer = new ContextAnalyzer(fileTransferManager, dataManager);
+		contextAnalyzer = new ContextAnalyzer(fileTransferManager, dataManager, whiteboard);
 		syntaxAnalyzer 	= new SyntaxAnalyzer();
 
 		// Manager für den XMPP-Dateitransfer initialisieren

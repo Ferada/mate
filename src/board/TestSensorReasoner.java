@@ -32,7 +32,6 @@ public class TestSensorReasoner extends LoggingReasoner {
 
   private HashMap<String, Properties> userData;
 
-  private HashMap<String,String> userActivities;
   private HashMap<String,String> userInterruptibilities;
 
   private HashMap<String, String> daaActivities;
@@ -46,12 +45,7 @@ public class TestSensorReasoner extends LoggingReasoner {
   }
 
   private void reset () {
-    userActivities = new HashMap<String,String> ();
     userInterruptibilities = new HashMap<String,String> ();
-    for (String username : userData.keySet ()) {
-      userActivities.put (username, "unknown");
-      userInterruptibilities.put (username, "1");
-    }
     initDAAActivities ();
     initDAAInterruptiblity ();
 
@@ -143,16 +137,12 @@ public class TestSensorReasoner extends LoggingReasoner {
     Literal userId = marker.getProperty (Sensors.property ("userID")).getLiteral ();
     String username = userId.getString ();
 
-    // activity
-    userActivities.put (username, activity);		
-
     // interruptibility
     String interruptibility = "interruptible";
     if (activity.equals ("shortBreak") || activity.equals ("longBreak"))
       interruptibility = "maybeInterruptible";
     if (activity.equals ("meeting") || activity.equals ("writing"))
       interruptibility = "uninterruptible";
-    userInterruptibilities.put (username, interruptibility);
 
     updateWorld (board, userId, activity, interruptibility);
   }
@@ -169,13 +159,9 @@ public class TestSensorReasoner extends LoggingReasoner {
 
     // activity
     String activity = daaActivities.get (program + frequency);
-    if (activity != null)
-      userActivities.put (username, activity);
 
     // interruptibility
     String interruptibility = daaInterruptibility.get (program + frequency);
-    if (interruptibility != null)
-      userInterruptibilities.put (username, interruptibility);
 
     updateWorld (board, userId,
 		 (activity == null) ? null : activity,
@@ -217,9 +203,6 @@ public class TestSensorReasoner extends LoggingReasoner {
       for (Map.Entry<String, Integer> e : speakers.entrySet ())
 	if (e.getValue () >= 5) {
 	  String username = e.getKey ();
-
-	  userInterruptibilities.put (username, "uninterruptible");
-	  userActivities.put (username, "meeting");
 
 	  updateWorld (board, ResourceFactory.createPlainLiteral (username),
 		       "uninterruptible",
