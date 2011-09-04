@@ -70,14 +70,6 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 		// Ressourcen initialisieren
 		dataManager		= DatabaseDataManager.createDataManager(jdbcDriver,dbUrl,dbUsername,dbPassword);
 
-		connection.connect();
-		// Einloggen
-		connection.login(hubName, hubPassword);
-
-		generator 		= new Generator(new SMSGateway(receiveSMS), new MailGateway(receiveMail), connection);
-		contextAnalyzer = new ContextAnalyzer(fileTransferManager, dataManager);
-		syntaxAnalyzer 	= new SyntaxAnalyzer();
-
 		whiteboard = new Whiteboard();
 		Client client1 = new TestSensorReasoner(dataManager.getUserData ());
 		Client client2 = new TestSensorReasoner(dataManager.getUserData ());
@@ -86,6 +78,10 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 		whiteboard.registerClient(client1);
 		whiteboard.registerClient(client2);
 	
+		generator 		= new Generator(new SMSGateway(receiveSMS), new MailGateway(receiveMail), connection);
+		contextAnalyzer = new ContextAnalyzer(fileTransferManager, dataManager);
+		syntaxAnalyzer 	= new SyntaxAnalyzer();
+
 		// Manager für den XMPP-Dateitransfer initialisieren
 		fileTransferManager = new FileTransferManager(connection);
 	    fileTransferManager.addFileTransferListener(this);
@@ -93,6 +89,10 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 	    if(!fileDirectory.exists()) {
 	    	fileDirectory.mkdirs();
 	    }
+
+		connection.connect();
+		// Einloggen
+		connection.login(hubName, hubPassword);
 	}
 
 	public void run() {
@@ -302,9 +302,14 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 	 * @param m Zu versendende Nachricht
 	 */
 	private void sendMessageToGenerator(DeviceMateMessage m) {
-		m.setSubjectDevice(hubName+"@"+server+"/Smack");
-		generator.handleMessage(	m,
-									dataManager.getChannelByJID(m.getObjectDevice()));
+		String subjectDevice = hubName + "@" + server + "/Smack";
+		String objectDevice = m.getObjectDevice ();
+		Channels channel = dataManager.getChannelByJID (objectDevice);
+
+		logger.trace ("sendMessageToGenerator " + subjectDevice + ", " + objectDevice + ", " + channel);
+
+		m.setSubjectDevice (subjectDevice);
+		generator.handleMessage (m, channel);
 	}
 
 }

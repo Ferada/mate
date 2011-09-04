@@ -4,6 +4,7 @@ import org.slf4j.*;
 
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.*;
+import com.hp.hpl.jena.datatypes.xsd.*;
 
 import static board.Whiteboard.parseXmppUri;
 
@@ -115,15 +116,15 @@ public class MessageConverter {
     }
 
     URI sensorURI = parseXmppUri (status.getSubjectDevice ());
-    URI userURI = parseXmppUri (request.getRequestObject ());
+    String userID = request.getRequestObject ();
 
     model.add (model.createStatement (marker,
 				      Sensors.property ("sensorJID"),
 				      ResourceFactory.createResource (sensorURI.toString ())));
 
     model.add (model.createStatement (marker,
-				      Sensors.property ("userJID"),
-				      ResourceFactory.createResource (userURI.toString ())));
+				      Sensors.property ("userID"),
+				      ResourceFactory.createTypedLiteral (userID, XSDDatatype.XSDstring)));
 
    /* TODO: what about rooms? */
 

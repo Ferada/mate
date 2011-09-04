@@ -128,6 +128,7 @@ public class TestSensorReasoner implements StatusReasoner {
 	}
 	
 	private void processCubusMessage(String username, String activity) {
+		logger.trace ("putting activity " + activity + " to user " + username);
 		// Activity
 		userActivities.put(username, activity);		
 		

@@ -11,6 +11,8 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 
+import static board.Whiteboard.writeToString;
+
 /**
  * Die MateConnection abstrahiert die XMPPConnection für die Benutzung durch die
  * Mate-Komponenten.
@@ -77,6 +79,8 @@ public class MateConnection extends XMPPConnection implements PacketListener {
 	 *            Mate-Nachricht, die an den Empfänger verschickt werden soll.
 	 */
 	public void sendMessage(DeviceMateMessage m) {
+		logger.trace ("sendMessage " + m.getObjectDevice ());
+
 		// Erzeuge eine XMPP-Nachricht
 		Message xmppm = new Message();
 
@@ -100,17 +104,23 @@ public class MateConnection extends XMPPConnection implements PacketListener {
 	 * Erhalt einer Nachricht informiert.
 	 */
 	public void processPacket(Packet p) {
-		// Parsen der XMPP-Nachricht -> MateMessage
-		if (p instanceof Message) {
-			Message xmppm = (Message) p;
-			// Parsen
-			DeviceMateMessage m = analyzer.analyzeMessage(xmppm.getBody());
-			m.setSubjectDevice(xmppm.getFrom());
+		try {
+			// Parsen der XMPP-Nachricht -> MateMessage
+			if (p instanceof Message) {
+				Message xmppm = (Message) p;
+				// Parsen
+				DeviceMateMessage m = analyzer.analyzeMessage(xmppm.getBody());
+				m.setSubjectDevice(xmppm.getFrom());
 
-			// Informiere die registrierten MateListener
-			for (MateListener l : listeners) {
-				l.processMessage(m);
+				// Informiere die registrierten MateListener
+				for (MateListener l : listeners)
+					l.processMessage(m);
 			}
+		}
+		catch (Throwable t) {
+			logger.error ("processPacket caught something: " + t);
+			logger.error (writeToString (t));
+			throw new RuntimeException (t);
 		}
 	}
 

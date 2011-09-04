@@ -26,16 +26,18 @@
 :sensorJID
       a       owl:ObjectProperty ;
       rdfs:domain :SensorValue ;
+      rdfs:range owl:Thing ;
       rdfs:label "Sensor-JID"@de, "sensor JID"@en ;
       rdfs:comment "Jabber ID of the sensor this value originated from."@en ,
                    "Jabber-ID des Sensors von dem dieser Wert stammt."@de .
 
-:userJID
-      a       owl:ObjectProperty ;
+:userID
+      a       owl:DatatypeProperty ;
       rdfs:domain :SensorValue ;
-      rdfs:label "Benutzer-JID"@de , "user JID"@en ;
-      rdfs:comment "Jabber ID of the user this value is meant for."@en ,
-                   "Jabber-ID des Benutzers für den dieser Wert bestimmt ist."@de .
+      rdfs:range xsd:string ;
+      rdfs:label "Benutzer-ID"@de , "user ID"@en ;
+      rdfs:comment "ID of the user this value is meant for."@en ,
+                   "ID des Benutzers für den dieser Wert bestimmt ist."@de .
 
 :roomID
       a       owl:ObjectProperty ;
@@ -90,7 +92,7 @@
               [ a owl:Class ;
                 owl:unionOf
                     ( [ a owl:Restriction ;
-                        owl:onProperty :userJID ;
+                        owl:onProperty :userID ;
                         owl:cardinality "1"^^xsd:nonNegativeInteger
                       ]
                       [ a owl:Restriction ;
@@ -104,25 +106,25 @@
       a       owl:Class ;
       rdfs:subClassOf :SensorValue ;
       rdfs:label "Mike Sensor Value"@en , "Mike-Sensorwert"@de ;
-      mate:primaryKey (:sensorJID :userJID) .
+      mate:primaryKey (:sensorJID :userID) .
 
 :CubeSensorValue
       a       owl:Class ;
       rdfs:subClassOf :SensorValue ;
       rdfs:label "Cube Sensor Value"@en , "Cube-Sensorwert"@de ;
-      mate:primaryKey (:sensorJID :userJID) .
+      mate:primaryKey (:sensorJID :userID) .
 
 :DesktopSensorValue
       a       owl:Class ;
       rdfs:subClassOf :SensorValue ;
       rdfs:label "Desktop Sensor Value"@en , "Desktopsensorwert"@de ;
-      mate:primaryKey (:sensorJID :userJID) .
+      mate:primaryKey (:sensorJID :userID) .
 
 :DoorSensorValue
       a       owl:Class ;
       rdfs:subClassOf :SensorValue ;
       rdfs:label "Door Sensor Value"@en , "Türsensorwert"@de ;
-      mate:primaryKey (:sensorJID :userJID :roomID) .
+      mate:primaryKey (:sensorJID :userID :roomID) .
 
 # enumeration classes
 

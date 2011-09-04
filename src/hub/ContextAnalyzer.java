@@ -1,5 +1,7 @@
 package hub;
 
+import org.slf4j.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,6 +27,7 @@ import comm.ResponseMessage;
 import comm.StatusMessage;
 
 class ContextAnalyzer {	
+	private static Logger logger = LoggerFactory.getLogger (ContextAnalyzer.class);
 	
 	/**
 	 * Data Manager
@@ -115,6 +118,8 @@ class ContextAnalyzer {
 	 * @return unveränderte PushStatusMessage
 	 */
 	public void analyzePushMessage(StatusMessage m) {
+		logger.trace ("analyzePushMessage");
+
 		Request req 						= m.getRequest();
 		HashMap<String,FieldData> entities	= req.getEntities();
 		boolean isAuthorized 				= false;
@@ -199,7 +204,8 @@ class ContextAnalyzer {
 	 * @return ResponseMessage
 	 */
 	public ResponseMessage analyzePullMessage(StatusMessage m) {
-		
+		logger.trace ("analyzePullMessage");
+
 		// Nachricht immer an den Reasoner Manager schicken.
 		reasonerManager.update(m);
 		ResponseMessage rm;
@@ -261,6 +267,8 @@ class ContextAnalyzer {
 	 * @return ResponseMessage
 	 */
 	private ResponseMessage analyzeDataRequest(StatusMessage m) {
+		logger.trace ("analyzeDataRequest");
+
 		Request req 							= m.getRequest();
 		HashMap<String,FieldData> entities		= req.getEntities();
 		ResponseMessage rm						= new ResponseMessage(req);
@@ -328,6 +336,7 @@ class ContextAnalyzer {
 				 * Eines der anderen Attribute (location, mobile_number, ...)
 				 */
 				default:
+					logger.trace ("default case");
 					entities.put(field, getFieldData(	m.getSubject(),
 														req.getRequestObject(),
 														a	));
@@ -372,6 +381,8 @@ class ContextAnalyzer {
 	 */
 	private FieldData getFieldData(String subject, String object,
 			AttributeFields attribute) {
+		logger.trace ("getFieldData " + subject + ", " + object + ", " + attribute);
+
 		String value = null;
 		// Überprüfen, ob subject die Berechtigung hat, das abgefragte Statusfeld von object
 		// zu sehen

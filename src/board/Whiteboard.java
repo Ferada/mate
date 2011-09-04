@@ -847,9 +847,9 @@ public class Whiteboard implements Board, Runnable {
     return writer.toString ();
   }
 
-  public static String writeToString (Throwable e) {
+  public static String writeToString (Throwable t) {
     StringWriter writer = new StringWriter ();
-    e.printStackTrace (new PrintWriter (writer));
+    t.printStackTrace (new PrintWriter (writer));
     return writer.toString ();
   }
 

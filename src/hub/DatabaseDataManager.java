@@ -213,6 +213,7 @@ public class DatabaseDataManager extends DataManager {
 	
 	@Override
 	boolean isEntityPublic(String subject, String object, AttributeFields entity) {
+		logger.trace ("isEntityPublic " + subject + ", " + object + ", " + entity);
 		if(subject.equals(object)) {
 			return true;
 		} else {
@@ -224,6 +225,7 @@ public class DatabaseDataManager extends DataManager {
 									+ " WHERE " + PRIVACY_SUBJECT + " = '" + subject + "'"
 									+ " AND " + PRIVACY_OBJECT + " = '" + object + "'"
 									+ " AND " + PRIVACY_ENTITY + " = '" + entity.toString() + "'";
+				logger.trace ("query = " + query);
 				Statement stmt 	= con.createStatement();
 				ResultSet rs 	= stmt.executeQuery( query );
 				while ( rs.next() ) {

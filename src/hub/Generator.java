@@ -1,5 +1,7 @@
 package hub;
 
+import org.slf4j.*;
+
 import java.io.IOException;
 
 import javax.mail.MessagingException;
@@ -17,6 +19,7 @@ import sms.SMSGateway;
  * 
  */
 class Generator {
+	private static Logger logger = LoggerFactory.getLogger (Generator.class);
 	
 	/**
 	 * SMS-Gateway des Awareness-Hubs.
@@ -51,7 +54,13 @@ class Generator {
 	 * @param c Kommunikationskanal, über den die Nachricht verschickt werden soll
 	 */
 	public void handleMessage(DeviceMateMessage m, Channels c) {
+		logger.trace ("handleMessage " + c + ", " + m.getClass ());
+
 		m = checkFormat(m,c);
+
+		if (c == null)
+			connection.sendMessage(m);
+		else
 		switch(c) {
 			/**
 			 * SMS
@@ -100,7 +109,9 @@ class Generator {
 	private DeviceMateMessage checkFormat(DeviceMateMessage m, Channels c) {
 		if(m instanceof CommMessage) {
 			CommMessage cm = (CommMessage) m;
-			if(c.equals(Channels.MOBILE_PHONE) || c.equals(Channels.MAIL) || c.equals(Channels.INSTANT_MESSENGER)) {
+			if(c != null && (c.equals(Channels.MOBILE_PHONE)
+					 || c.equals(Channels.MAIL) ||
+					 c.equals(Channels.INSTANT_MESSENGER))) {
 				cm.setUserMessage(true);
 			} else {
 				cm.setUserMessage(false);
@@ -108,7 +119,9 @@ class Generator {
 			return cm;
 		} else if(m instanceof ResponseMessage) {
 			ResponseMessage rm = (ResponseMessage) m;
-			if(c.equals(Channels.MOBILE_PHONE) || c.equals(Channels.MAIL) || c.equals(Channels.INSTANT_MESSENGER)) {
+			if(c != null && (c.equals(Channels.MOBILE_PHONE)
+					 || c.equals(Channels.MAIL)
+					 || c.equals(Channels.INSTANT_MESSENGER))) {
 				rm.setUserMessage(true);
 			} else {
 				rm.setUserMessage(false);

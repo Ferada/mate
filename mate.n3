@@ -77,14 +77,14 @@
 :historyType
       a       owl:ObjectProperty ;
       rdfs:domain :HistoryEntry ;
-      rdfs:label "history type"@en , "History-Typ"@de ;
-      rdfs:range owl:Class .
+      rdfs:range owl:Class ;
+      rdfs:label "history type"@en , "History-Typ"@de .
 
 :historyEntries
       a       owl:ObjectProperty ;
       rdfs:domain :HistoryEntry ;
-      rdfs:label "History-Einträge"@de , "history entries"@en ;
-      rdfs:range rdf:List .
+      rdfs:range rdf:List ;
+      rdfs:label "History-Einträge"@de , "history entries"@en .
 
 :AvailabilityModKey
       a       :PrimaryKey ;
@@ -93,12 +93,13 @@
 
 # TODO: narf, duplicating sensors stuff, should we use sameAs or some other convention?
 
-:userJID
-      a       owl:ObjectProperty ;
+:userID
+      a       owl:DatatypeProperty ;
       rdfs:domain :SensorValue ;
-      rdfs:label "Benutzer-JID"@de , "user JID"@en ;
-      rdfs:comment "Jabber ID of the user this value is meant for."@en ,
-                   "Jabber-ID des Benutzers für den dieser Wert bestimmt ist."@de .
+      rdfs:range xsd:string ;
+      rdfs:label "Benutzer-ID"@de , "user ID"@en ;
+      rdfs:comment "ID of the user this value is meant for."@en ,
+                   "ID des Benutzers für den dieser Wert bestimmt ist."@de .
 
 :activity
       a       owl:ObjectProperty ;
@@ -113,7 +114,7 @@
 
 :ActivityValue
       a       owl:Class ;
-      :primaryKey (:userJID) ;
+      :primaryKey (:userID) ;
       rdfs:label "Activity Value"@en , "Aktivitätswert"@de .
 
 :interruptible
@@ -129,6 +130,6 @@
 
 :InterruptibilityValue
       a       owl:Class ;
-      :primaryKey (:userJID) ;
+      :primaryKey (:userID) ;
       rdfs:label "Interruptibility Value"@en , "Unterbrechbarkeitswert"@de .
 

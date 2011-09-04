@@ -13,7 +13,7 @@ import joptsimple.*;
  * Encapsulates all options in a type-safe and convenient singleton.
  */
 public class Options {
-  private static Logger logger = LoggerFactory.getLogger (AwarenessHub.class);
+  private static Logger logger = LoggerFactory.getLogger (Options.class);
 
   private static Options instance;
 

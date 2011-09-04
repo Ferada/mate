@@ -90,7 +90,7 @@ public class TestSensorReasoner extends LoggingReasoner {
     daaActivities.put ("browser"+"veryActive"	, "writing");
   }
 
-  private void updateWorld (Board board, Resource userJid, String activity, String interruptibility) {
+  private void updateWorld (Board board, Literal userId, String activity, String interruptibility) {
     /* so now translate the two put-operations into rdf stuff */
     Model update = ModelFactory.createDefaultModel ();
 
@@ -98,13 +98,13 @@ public class TestSensorReasoner extends LoggingReasoner {
     Resource marker = update.createResource ();
     update.add (update.createStatement (marker, RDF.type, Mate.resource ("ActivityValue")));
     update.add (update.createStatement (marker, Mate.property ("activity"), Mate.resource (activity)));
-    update.add (update.createStatement (marker, Mate.property ("userJID"), userJid));
+    update.add (update.createStatement (marker, Mate.property ("userID"), userId));
 
     /* then interruptibility */
     marker = update.createResource ();
     update.add (update.createStatement (marker, RDF.type, Mate.resource ("InterruptibilityValue")));
     update.add (update.createStatement (marker, Mate.property ("interruptible"), Mate.resource (interruptibility)));
-    update.add (update.createStatement (marker, Mate.property ("userJID"), userJid));
+    update.add (update.createStatement (marker, Mate.property ("userID"), userId));
     
     /* we only post a normal data structure, another client is then
        responsible for turning the huge information into small chunks
@@ -140,8 +140,8 @@ public class TestSensorReasoner extends LoggingReasoner {
     String activity = state.getLocalName ();
     logger.info ("got a new cube state = " + activity);
 
-    Resource userJid = marker.getProperty (Sensors.property ("userJID")).getResource ();
-    String username = userJid.getURI ();
+    Literal userId = marker.getProperty (Sensors.property ("userID")).getLiteral ();
+    String username = userId.getString ();
 
     // activity
     userActivities.put (username, activity);		
@@ -154,7 +154,7 @@ public class TestSensorReasoner extends LoggingReasoner {
       interruptibility = "uninterruptible";
     userInterruptibilities.put (username, interruptibility);
 
-    updateWorld (board, userJid, activity, interruptibility);
+    updateWorld (board, userId, activity, interruptibility);
   }
 
   private void handleDesktop (Board board, Model model, MateClass klass, Resource marker) {
@@ -164,8 +164,8 @@ public class TestSensorReasoner extends LoggingReasoner {
     String frequency = frequencyResource.getLocalName ();
     logger.info ("got a new desktop state = " + program + ", " + frequency);
 
-    Resource userJid = marker.getProperty (Sensors.property ("userJID")).getResource ();
-    String username = userJid.getURI ();
+    Literal userId = marker.getProperty (Sensors.property ("userID")).getLiteral ();
+    String username = userId.getString ();
 
     // activity
     String activity = daaActivities.get (program + frequency);
@@ -177,7 +177,7 @@ public class TestSensorReasoner extends LoggingReasoner {
     if (interruptibility != null)
       userInterruptibilities.put (username, interruptibility);
 
-    updateWorld (board, userJid,
+    updateWorld (board, userId,
 		 (activity == null) ? null : activity,
 		 (interruptibility == null) ? null : interruptibility);
   }
@@ -221,7 +221,7 @@ public class TestSensorReasoner extends LoggingReasoner {
 	  userInterruptibilities.put (username, "uninterruptible");
 	  userActivities.put (username, "meeting");
 
-	  updateWorld (board, ResourceFactory.createResource (username),
+	  updateWorld (board, ResourceFactory.createPlainLiteral (username),
 		       "uninterruptible",
 		       "meeting");
 	}
