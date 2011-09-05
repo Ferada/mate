@@ -18,9 +18,18 @@ import hub.*;
 import java.util.*;
 import java.net.*;
 
+/**
+ * Converts between {@link AttributeFields} objects and RDF strings;
+ * also kind of implements the {@link reasoner.StatusReasoner#getStatus}
+ * method for {@link Whiteboard} integration.
+ */
 public class FieldConverter {
   private static Logger logger = LoggerFactory.getLogger (FieldConverter.class);
 
+  /**
+   * Translates from {@link AttributeFields} to MATe ontology enumeration
+   * strings.
+   */
   private static Resource getAttributeProperty (AttributeFields attribute) {
     switch (attribute) {
     case ACTIVITY:
@@ -32,6 +41,9 @@ public class FieldConverter {
     }
   }
 
+  /**
+   * Translates from {@link AttributeFields} to MATe ontology class names.
+   */
   private static Resource getAttributeType (AttributeFields attribute) {
     switch (attribute) {
     case ACTIVITY:
@@ -43,6 +55,10 @@ public class FieldConverter {
     }
   }
 
+  /**
+   * Translates to {@link AttributeFields} from MATe ontology enumeration
+   * strings.
+   */
   private static String translateArchaic (AttributeFields attribute, String string) {
     if (string != null && attribute == AttributeFields.INTERRUPTIBILITY) {
       if (string.equals ("uninterruptible"))
@@ -61,12 +77,18 @@ public class FieldConverter {
     return string;
   }
 
-  public static String getStatus (Whiteboard whiteboard, String userId, AttributeFields attribute) {
+  /**
+   * Extracts information from the {@link Whiteboard} following the
+   * {@link reasoner.StatusReasoner#getStatus} semantics.
+   */
+  public static String getStatus (Whiteboard whiteboard, String userId,
+				  AttributeFields attribute) {
     logger.trace ("getstatus " + userId + ", " + attribute);
 
     final String queryString = "PREFIX rdf: <" + RDF.getURI () + "> "
       + "PREFIX mate: <" + Mate.prefix + "> "
-      + "SELECT ?marker ?value ?type ?property ?user FROM NAMED <" + Mate.uri + "/graphs#world> WHERE {"
+      + "SELECT ?marker ?value ?type ?property ?user "
+      + "FROM NAMED <" + Mate.uri + "/graphs#world> WHERE {"
       + "?marker rdf:type ?type . "
       + "?marker ?property ?value . "
       + "?marker mate:userID ?user . "

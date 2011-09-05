@@ -44,9 +44,6 @@ public class ResponseMessage extends DeviceMateMessage {
 	
 	/**
 	 * Erzeugt eine Antwortnachricht.
-	 * 
-	 * @param fields	Liste mit den abgefragten Statusfeldern und deren Werten
-	 * @param contacts	Liste aller MATe-Kontakte
 	 */
 	public ResponseMessage(Request req) {
 		request		= req;

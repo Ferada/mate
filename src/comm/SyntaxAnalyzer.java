@@ -473,7 +473,7 @@ public class SyntaxAnalyzer extends DefaultHandler {
 	 * @param chunks
 	 * 	String array to be merged
 	 * 
-	 * @param index
+	 * @param offset
 	 * 	Array index from where merging starts
 	 * 
 	 * @return

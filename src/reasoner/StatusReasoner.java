@@ -24,7 +24,7 @@ public interface StatusReasoner {
 	 * Gibt den Wert des übergebenen Statusfeldes bezüglich eines Benutzers zurück.
 	 * 
 	 * @param username Benutzername des MATe-Users, dessen Status abgefragt wird
-	 * @param r	abgefragtes Statusfeld
+	 * @param attribute abgefragtes Statusfeld
 	 * 
 	 * @return 	Wert des Statusfeldes als String
 	 * 			oder null, falls der Reasoner kein Ergebnis liefern kann

@@ -23,6 +23,12 @@ import java.net.*;
 public class MessageConverter {
   private static Logger logger = LoggerFactory.getLogger (MessageConverter.class);
 
+  /**
+   * Returns objects of type <code>CubeSensorValue</code>,
+   * <code>DesktopSensorValue</code>, <code>DoorSensorValue</code>
+   * and <code>MikeSensorValue</code> by converting the
+   * {@link StatusMessage} object to an RDF {@link Model}.
+   */
   public static Model convert (StatusMessage status) {
     Model model = ModelFactory.createDefaultModel ();
     String subject = status.getSubject ();

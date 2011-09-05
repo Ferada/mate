@@ -29,7 +29,7 @@ public enum Channels {
 	/**
 	 * Liefert ein Channels-Objekt zu seiner String-Repräsentation.
 	 * @param name
-	 * @return
+	 * @return Ein neues Channels-Objekt
 	 */
 	public static Channels getChannelByName(String name) {
 		if("im".equals(name)) {

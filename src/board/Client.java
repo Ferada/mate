@@ -8,7 +8,7 @@ import com.hp.hpl.jena.rdf.model.*;
 public interface Client extends Runnable {
   /**
    * An identifier to aid debugging.  The client should incorporate this
-   * into its {@link #toString} output.
+   * into its {@link Object#toString} output.
    */
   public void setName (String name);
 

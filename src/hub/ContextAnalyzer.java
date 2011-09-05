@@ -121,7 +121,6 @@ class ContextAnalyzer {
 	 * anschließend nicht weiterverarbeiten.
 	 * 
 	 * @param m PushStatusMessage
-	 * @return unveränderte PushStatusMessage
 	 */
 	public void analyzePushMessage(StatusMessage m) {
 		logger.trace ("analyzePushMessage");

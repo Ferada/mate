@@ -97,7 +97,8 @@ public class ReasonerManager {
 	 * Fragt den Wert des übergebenen Statusfeldes eines Benutzers bei dem entsprechenden
 	 * registrierten Reasoner ab.
 	 * 
-	 * @param s	Statusattribut, welches abgefragt wird
+	 * @param username Benutzername des MATe-Users, dessen Status abgefragt wird
+	 * @param a Statusattribut, welches abgefragt wird
 	 * @return	Wert des Statusattributs
 	 * 			oder null, falls kein entsprechender Reasoner registriert ist
 	 */

@@ -14,6 +14,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
 /**
  * Implements an example from the former MATe Sensors group in the shiny
  * new way.  Funny enough it has the same name as the class it replaces.
+ * @see reasoner.TestSensorReasoner
  */
 public class TestSensorReasoner extends LoggingReasoner {
   private static Logger logger = LoggerFactory.getLogger (TestSensorReasoner.class);

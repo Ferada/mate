@@ -31,7 +31,6 @@ public class ExampleChannelReasoner implements ChannelReasoner {
 	
 	/**
 	 * Erzeugt einen neuen ExampleChannelReasoner
-	 * @param userData 
 	 */
 	public ExampleChannelReasoner(	HashMap<String, ArrayList<ChannelPriority>> channelPriorities,
 									HashMap<String, Properties> roomDevices	) {
