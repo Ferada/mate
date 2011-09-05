@@ -23,6 +23,7 @@ public final class TinyJabber {
     OptionParser parser = new OptionParser () {
 	{
 	  acceptsAll (asList ("h", "?", "help"), "display this help and exit");
+	  acceptsAll (asList ("v", "verbose"), "prints the constructed message");
 	  acceptsAll (asList ("s", "xmpp.server"), "Jabber server name")
 	    .withRequiredArg ().ofType (String.class).defaultsTo ("localhost");
 	  acceptsAll (asList ("u", "xmpp.user"), "Jabber username (for this client)")
@@ -106,8 +107,8 @@ public final class TinyJabber {
       if (other || type.equals ("door"))
 	System.out.println ("door state is one of (un-)interruptible or maybeInterruptible");
       if (other || type.equals ("desktop"))
-	System.out.println ("desktop frequency is one of liest, aktiv, schreibt, schreibt viel or inaktiv\n" +
-			    "desktop program is one of browser or textverarbeitung");
+	System.out.println ("desktop frequency is one of inactive, active or very_active\n" +
+			    "desktop program is one of browser, text or unknown");
       if (other || type.equals ("mike"))
 	System.out.println ("mike parameters are two speaker names, freeform");
 
@@ -205,6 +206,8 @@ public final class TinyJabber {
 
     Message msg = new Message ();
     msg.setTo ((String) options.valueOf ("to"));
+    if (options.has ("verbose"))
+      System.out.println (body);
     msg.setBody (body);
     mate.sendPacket (msg);
   }
@@ -219,8 +222,8 @@ public final class TinyJabber {
 
   public static String makeMikeMessage (String user, String speaker1, String speaker2) {
     return makeStatusMessage (user, "mike",
-			      entity ("speaker1", parseXmppUri (speaker1).toString ()) +
-			      entity ("speaker2", parseXmppUri (speaker2).toString ()));
+			      entity ("speaker1", speaker1) +
+			      entity ("speaker2", speaker2));
   }
 
   public static String makeDesktopMessage (String user, String status, String program) {

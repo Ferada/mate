@@ -49,10 +49,16 @@ public class MessageConverter {
 
       if (!entities.containsKey ("cubusstate"))
 	logger.warn ("missing entity 'cubusstate'");
-      else
+      else {
+	String string = entities.get ("cubusstate").getValue ();
+	if (string.equals ("break_long"))
+	  string = "longBreak";
+	else if (string.equals ("break_short"))
+	  string = "shortBreak";
 	model.add (model.createStatement (marker,
 					  Sensors.property ("cubeSensorState"),
-					  Sensors.resource (entities.get ("cubusstate").getValue ())));
+					  Sensors.resource (string)));
+      }
     }
     else if (subject.equals ("daa")) {
       model.add (model.createStatement (marker, RDF.type, Sensors.resource ("DesktopSensorValue")));
@@ -65,10 +71,14 @@ public class MessageConverter {
 					  Sensors.resource (entities.get ("program").getValue ())));
       if (!entities.containsKey ("frequency"))
 	logger.warn ("missing entity 'frequency'");
-      else
+      else {
+	String string = entities.get ("frequency").getValue ();
+	if (string.equals ("very_active"))
+	  string = "veryActive";
 	model.add (model.createStatement (marker, 
 					  Sensors.property ("desktopSensorFrequency"),
-					  Sensors.resource (entities.get ("frequency").getValue ())));
+					  Sensors.resource (string)));
+      }
     }
     else if (subject.equals ("doorlight")) {
       model.add (model.createStatement (marker, RDF.type, Sensors.resource ("DoorSensorValue")));
@@ -101,14 +111,16 @@ public class MessageConverter {
       else
 	model.add (model.createStatement (marker, 
 					  Sensors.property ("mikeSensorSpeaker"),
-					  ResourceFactory.createResource (entities.get ("speaker1").getValue ())));
+					  ResourceFactory.createTypedLiteral (entities.get ("speaker1").getValue (),
+									      XSDDatatype.XSDstring)));
 
       if (!entities.containsKey ("speaker2"))
 	logger.warn ("missing entity 'speaker2'");
       else
 	model.add (model.createStatement (marker, 
 					  Sensors.property ("mikeSensorSpeaker"),
-					  ResourceFactory.createResource (entities.get ("speaker2").getValue ())));
+					  ResourceFactory.createTypedLiteral (entities.get ("speaker2").getValue (),
+									      XSDDatatype.XSDstring)));
     }
     else {
       logger.warn ("unknown subject " + subject + ", ignoring");

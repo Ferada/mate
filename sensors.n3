@@ -59,8 +59,9 @@
       rdfs:range :DesktopSensorFrequency .
 
 :mikeSensorSpeaker
-      a       owl:ObjectProperty ;
+      a       owl:DatatypeProperty ;
       rdfs:domain :MikeSensorValue ;
+      rdfs:range xsd:string ;
       rdfs:label "Mike-Sensorsprecher"@en , "mike sensor speaker"@en .
 
 :cubeSensorState

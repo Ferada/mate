@@ -3,6 +3,7 @@ package board;
 import org.slf4j.*;
 
 import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.datatypes.xsd.*;
 
 import java.util.*;
 
@@ -178,8 +179,8 @@ public class TestSensorReasoner extends LoggingReasoner {
       return;
     }
 
-    String speaker1 = list.get (0).getResource ().getURI ();
-    String speaker2 = list.get (1).getResource ().getURI ();
+    String speaker1 = list.get (0).getLiteral ().getString ();
+    String speaker2 = list.get (1).getLiteral ().getString ();
 
     // 5 Mike Nachrichten annehmen
     mikeBuffer.add (new SpeakerPair (speaker1, speaker2));
@@ -204,7 +205,7 @@ public class TestSensorReasoner extends LoggingReasoner {
 	if (e.getValue () >= 5) {
 	  String username = e.getKey ();
 
-	  updateWorld (board, ResourceFactory.createPlainLiteral (username),
+	  updateWorld (board, ResourceFactory.createTypedLiteral (username, XSDDatatype.XSDstring),
 		       "uninterruptible",
 		       "meeting");
 	}
