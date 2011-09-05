@@ -55,7 +55,7 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 	 * initialisert benötigte Ressourcen und verweilt dann in einer Endlosschleife,
 	 * bis das Attribut run auf false gesetzt wird, danach wird die Verbindung abgebrochen.
 	 */
-	public AwarenessHub(String host, String username, String password,
+	public AwarenessHub(Options options, String host, String username, String password,
 			    String jdbcDriver, String dbUrl, String dbUsername, String dbPassword,
 			    boolean receiveSMS, boolean receiveMail) throws Exception {
 		// Logindaten initialisieren
@@ -70,7 +70,7 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 		// Ressourcen initialisieren
 		dataManager		= DatabaseDataManager.createDataManager(jdbcDriver,dbUrl,dbUsername,dbPassword);
 
-		whiteboard = new Whiteboard();
+		whiteboard = new Whiteboard(options);
 		Client client1 = new TestSensorReasoner(dataManager.getUserData ());
 		Client client2 = new TestSensorReasoner(dataManager.getUserData ());
 		client1.setName ("1");
@@ -179,11 +179,19 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 	 * 				Attribute in AwarenessHub(...)
 	 */
 	public static void main(String args[]) throws Exception {
-	  Options options = Options.parse (args);
+	  Options options = Options.getInstance ();
+	  boolean exit = false;
+	  try {
+	    options.parse (args);
+	  }
+	  catch (Exception e) {
+	    logger.error (Whiteboard.writeToString (e));
+	    exit = true;
+	  }
 
-	  if (options.help) {
+	  if (exit || options.help) {
 	    System.out.println ("Usage: hub.AwarenessHub [OPTION]...");
-	    options.parser.printHelpOn (System.out);
+	    options.printHelpOn (System.out);
 	    return;
 	  }
 	  if (options.version) {
@@ -191,7 +199,8 @@ class AwarenessHub implements MateListener, SMSListener, MailListener, FileTrans
 	    return;
 	  }
 
-	  final AwarenessHub hub = new AwarenessHub (options.xmppServer, options.xmppUsername,
+	  final AwarenessHub hub = new AwarenessHub (options,
+						     options.xmppServer, options.xmppUsername,
 						     options.xmppPassword,
 						     options.jdbcDriver, options.jdbcUrl,
 						     options.jdbcUsername, options.jdbcPassword,

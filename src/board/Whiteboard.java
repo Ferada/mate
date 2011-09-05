@@ -31,6 +31,8 @@ import java.util.concurrent.*;
 
 import board.vocabulary.*;
 
+import hub.*;
+
 import comm.*;
 
 /**
@@ -121,15 +123,15 @@ public class Whiteboard implements Board, Runnable {
    */
   private Map<String, Combiner> combiners;
 
-  public Whiteboard () throws FileNotFoundException {
-    reset ();
+  public Whiteboard (Options options) throws FileNotFoundException {
+    reset (options);
   }
 
   /**
    * Resets the board to a known (clean/empty?) state.  May fail if
    * ontology or example files were not found.
    */
-  public void reset () throws FileNotFoundException {
+  public void reset (Options options) throws FileNotFoundException {
     prefixes = PrefixMapping.Factory.create ();
     prefixes.setNsPrefix ("rdf", RDF.getURI ());
     prefixes.setNsPrefix ("xsd", XSD.getURI ());
@@ -197,9 +199,13 @@ public class Whiteboard implements Board, Runnable {
 
     combiners = new HashMap<String, Combiner> ();
 
-    reasoner = ReasonerRegistry.getOWLMicroReasoner ();
-    // reasoner = ReasonerRegistry.getOWLMiniReasoner ();
-    // reasoner = ReasonerRegistry.getOWLReasoner ();
+    String string = Options.getInstance ().reasoner;
+    if (string.equals ("micro"))
+      reasoner = ReasonerRegistry.getOWLMicroReasoner ();
+    else if (string.equals ("mini"))
+      reasoner = ReasonerRegistry.getOWLMiniReasoner ();
+    else if (string.equals ("full"))
+      reasoner = ReasonerRegistry.getOWLReasoner ();
 
     mateReasoner = reasoner.bindSchema (mateOntology.model);
     sensorReasoner = reasoner.bindSchema (sensorOntology.model);
@@ -245,7 +251,26 @@ public class Whiteboard implements Board, Runnable {
   }
 
   public static void main (String args[]) throws Exception {
-    Whiteboard board = new Whiteboard ();
+    Options options = Options.getInstance ();
+    boolean exit = false;
+    try {
+      options.parse (args);
+    }
+    catch (Exception e) {
+      logger.error (writeToString (e));
+    }
+
+    if (exit || options.help) {
+      System.out.println ("Usage: board.Whiteboard [OPTION]...");
+      options.printHelpOn (System.out);
+      return;
+    }
+    if (options.version) {
+      System.out.println ("MATe Whiteboard (c) 2011");
+      return;
+    }
+
+    Whiteboard board = new Whiteboard (options);
 
     Thread thread = new Thread (board, "whiteboard event thread");
     thread.start ();

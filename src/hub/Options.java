@@ -19,6 +19,8 @@ public class Options {
 
   public OptionParser parser;
 
+  private static final List<String> reasonerValues = asList ("micro", "mini", "full");
+
   private ArgumentAcceptingOptionSpec<File> confOpt;
   private ArgumentAcceptingOptionSpec<String> xmppServerOpt;
   private ArgumentAcceptingOptionSpec<String> xmppUsernameOpt;
@@ -29,6 +31,7 @@ public class Options {
   private ArgumentAcceptingOptionSpec<String> jdbcPasswordOpt;
   private ArgumentAcceptingOptionSpec<String> mailOpt;
   private ArgumentAcceptingOptionSpec<String> smsOpt;
+  private ArgumentAcceptingOptionSpec<String> reasonerOpt;
 
   private Map<ArgumentAcceptingOptionSpec, String> map;
 
@@ -47,6 +50,7 @@ public class Options {
   public String jdbcPassword;
   public boolean mail;
   public boolean sms;
+  public String reasoner;
 
   private Options () {
     map = new HashMap<ArgumentAcceptingOptionSpec, String> ();
@@ -98,6 +102,10 @@ public class Options {
 	  map.put (smsOpt = acceptsAll (asList ("sms"), "enable sms reception")
 		   .withOptionalArg (),
 		   "sms");
+
+	  map.put (reasonerOpt = acceptsAll (asList ("board.reasoner"), "reasoner implementation")
+		   .withRequiredArg (),
+		   "board.reasoner");
 	}
       };
   }
@@ -106,14 +114,15 @@ public class Options {
     String name = map.get (spec);
     if (!set.has (spec)) {
       String value = properties.getProperty (name);
-      spec.defaultsTo (value);
+      if (value != null)
+	spec.defaultsTo (value);
     }
     String result = set.valueOf (spec);
     logger.trace (name + " = " + result);
     return result;
   }
 
-  private void parseArguments (String args[]) throws Exception {
+  public synchronized void parse (String args[]) throws Exception {
     set = parser.parse (args);
 
     FileInputStream file = null;
@@ -146,25 +155,29 @@ public class Options {
 
     mail = Boolean.valueOf (set (mailOpt));
     sms = Boolean.valueOf (set (smsOpt));
+
+    
+    if (!reasonerValues.contains (reasoner = set (reasonerOpt))) {
+      logger.error ("reasoner should be one of " + reasonerValues); //writeToString (reasonerValues));
+      throw new RuntimeException ("invalid value of reasoner '" + reasoner + "'");
+    }
   }
 
-  /**
-   * Parses the command line arguments and constructs the singleton of
-   * this class.  Returns early (i.e. doesn't parse the configuration
-   * file) if <code>"help"</code> or <code>"version"</code> parameters
-   * were used.
-   */
-  public static Options parse (String args[]) throws Exception {
-    instance = new Options ();
-    instance.parseArguments (args);
-    return instance;
+  public synchronized void printHelpOn (OutputStream sink) throws IOException {
+    parser.printHelpOn (sink);
   }
+
+  // private String writeToString (List<String> list) {
+  //   StringBuffer
+  // }
 
   /**
    * Returns the singleton of this class.  If you call this before
    * {@link #parse} was called, you will get null as a result.
    */
-  public static Options getInstance () {
+  public synchronized static Options getInstance () {
+    if (instance == null)
+      instance = new Options ();
     return instance;
   }
 }
