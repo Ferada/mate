@@ -29,7 +29,7 @@
 :primaryKey
       a       owl:AnnotationProperty ;
       rdfs:domain owl:Class ;
-      rdfs:range :PrimaryKey ;
+      rdfs:range :PropertyList ;
       rdfs:comment """Definiert einen Primärschlüssel der
 	angegebenen Klasse.  Diese Funktion wird von der MATe
 	Whiteboard-Implementierung benutzt um beispielsweise Sensordaten
@@ -40,7 +40,7 @@
 	create histories on them."""@en .
 
 :AvailabilityKey
-      a       :PrimaryKey ;
+      a       :PropertyList ;
       rdf:first :jid ;
       rdf:rest () .
 
@@ -66,9 +66,9 @@
       rdfs:label "available"@en , "verfügbar"@de ;
       rdfs:range xsd:boolean .
 
-:PrimaryKey
+:PropertyList
       a       owl:Class ;
-      rdfs:label "Primary Key"@en , "Primärschlüssel"@de ;
+      rdfs:label "Property List"@en , "Property-Liste"@de ;
       rdfs:subClassOf rdf:List ;
       rdfs:subClassOf
               [ a       owl:Restriction ;
@@ -88,8 +88,25 @@
       rdfs:range rdf:List ;
       rdfs:label "History-Einträge"@de , "history entries"@en .
 
+:ExtractMode
+      a       owl:Class ;
+      rdfs:label "Extract Mode"@en , "Extraktionsmodus"@de ;
+      owl:oneOf (:closure :1-step :explicit) .
+
+:extractMode
+      a       owl:AnnotationProperty ;
+      rdfs:domain owl:Class ;
+      rdfs:range :ExtractMode ;
+      rdfs:label "extract mode"@en , "Extraktionsmodus"@de .
+
+:extractExplicit
+      a       owl:AnnotationProperty ;
+      rdfs:domain owl:Class ;
+      rdfs:range :PropertyList ;
+      rdfs:label "extract explicit"@en , "extrahiere explizit"@de .
+
 :AvailabilityModKey
-      a       :PrimaryKey ;
+      a       :PropertyList ;
       rdf:first :jid ;
       rdf:rest () .
 
@@ -134,4 +151,3 @@
       a       owl:Class ;
       :primaryKey (:userID) ;
       rdfs:label "Interruptibility Value"@en , "Unterbrechbarkeitswert"@de .
-
