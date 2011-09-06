@@ -489,6 +489,22 @@ public class Whiteboard implements Board, Runnable {
     addFilters (var, marker, klass, group);
   }
 
+  public Model extract (Resource marker, MateClass klass) {
+    switch (klass.mode) {
+    case EXPLICIT:
+      Model result = ModelFactory.createDefaultModel ();
+      for (Property property : klass.extractExplicit)
+	result.add (marker.listProperties (property));
+      return null;
+    case ONE_STEP:
+      return ModelFactory.createDefaultModel ().add (marker.listProperties ());
+    case CLOSURE:
+      return Closure.closure (marker, true);
+    default:
+      throw new IllegalArgumentException ("well, this can't happen, ExtractMode should only have three possible values");
+    }
+  }
+
   public List<Model> matching (Model test, Resource marker, MateClass klass) {
     List<Model> result = new ArrayList<Model> ();
 
@@ -519,7 +535,7 @@ public class Whiteboard implements Board, Runnable {
 	ResultSet results = exec.execSelect ();
 	while (results.hasNext ()) {
 	  QuerySolution solution = results.next ();
-	  result.add (Closure.closure (solution.get ("marker").asResource (), true));
+	  result.add (extract (solution.get ("marker").asResource (), klass));
 	}
       }
       finally {

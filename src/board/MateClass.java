@@ -20,31 +20,96 @@ public class MateClass {
 
   public List<Property> primaryKey;
 
+  public enum ExtractMode {
+    EXPLICIT,
+    ONE_STEP,
+    CLOSURE
+  };
+
+  public ExtractMode mode;
+
+  public List<Property> extractExplicit;
+
   /**
    * Creates a new MateClass instance if possible (i.e. the class of
    * that name exists and its primary key is defined).
    */
   public static MateClass create (OntClass typeClass) {
-    Statement statement = typeClass.getProperty (Mate.primaryKey);
+    Statement statement = typeClass.getProperty (Mate.ignoreIndex);
+
+    try {
+      if (statement != null && statement.getBoolean ())
+	return null;
+    }
+    catch (Exception e) {
+      logger.error ("value for property ignoreIndex wasn't a boolean: "
+		    + statement.getObject () + ", ignoring class "
+		    + typeClass.getLocalName ());
+      return null;
+    }
+
+    statement = typeClass.getProperty (Mate.primaryKey);
     if (statement == null) {
       logger.warn ("there is no primary key defined for type " + typeClass.getLocalName () + ", can't create class");
       return null;
     }
 
     List<Resource> resources = Whiteboard.convertRdfList (statement.getResource ());
-    List<Property> properties = new ArrayList<Property> ();
+    List<Property> key = new ArrayList<Property> ();
 
     for (Resource resource : resources) {
-      logger.trace ("resource = " + resource.getURI ());
-      properties.add (ResourceFactory.createProperty (resource.getURI ()));
+      logger.trace ("resource = " + resource.getLocalName ());
+      key.add (ResourceFactory.createProperty (resource.getURI ()));
     }
 
-    return new MateClass (typeClass, properties);
+    ExtractMode mode = ExtractMode.ONE_STEP;
+    List<Property> extract = null;
+
+    statement = typeClass.getProperty (Mate.extractMode);
+    if (statement == null)
+      logger.info ("there is no extract mode defined for type " + typeClass.getLocalName () + ", defaulting to " + mode);
+    else {
+      Resource resource = statement.getResource ();
+
+      if (resource.equals (Mate.explicit))
+	mode = ExtractMode.EXPLICIT;
+      else if (resource.equals (Mate.oneStep))
+	mode = ExtractMode.ONE_STEP;
+      else if (resource.equals (Mate.closure))
+	mode = ExtractMode.CLOSURE;
+      else
+	logger.error ("unknown extract mode " + resource.getLocalName () + ", defaulting to " + mode);
+    }
+
+    if (mode == ExtractMode.EXPLICIT) {
+      statement = typeClass.getProperty (Mate.extractExplicit);
+
+      if (statement == null) {
+	logger.error ("extract mode is explicit, but no list of properties is defined, ignoring class "
+		      + typeClass.getLocalName ());
+	return null;
+      }
+
+      resources = Whiteboard.convertRdfList (statement.getResource ());
+      extract = new ArrayList<Property> ();
+
+      for (Resource resource : resources) {
+	logger.trace ("extract = " + resource.getLocalName ());
+	extract.add (ResourceFactory.createProperty (resource.getURI ()));
+      }
+
+      if (!extract.containsAll (key))
+	logger.warn ("extract list doesn't contain all defined primary key properties");
+    }
+
+    return new MateClass (typeClass, key, mode, extract);
   }
 
-  private MateClass (OntClass base, List<Property> primaryKey) {
+  private MateClass (OntClass base, List<Property> primaryKey, ExtractMode mode, List<Property> extract) {
     this.base = base;
     this.primaryKey = primaryKey;
+    this.mode = mode;
+    extractExplicit = extract;
   }
 
   public String toString () {

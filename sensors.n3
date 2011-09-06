@@ -13,6 +13,7 @@
 
 :DoorSensorState
       a       owl:Class ;
+      :ignoreIndex "true"^^xsd:boolean ;
       rdfs:label "Türsensorzustand"@de , "Door Sensor State"@en ;
       owl:oneOf (:uninterruptible :interruptible :maybeInterruptible) .
 
@@ -80,6 +81,7 @@
 
 :SensorValue
       a       owl:Class ;
+      :ignoreIndex "true"^^xsd:boolean ;
 # sensor values have exactly one associated sensor
       rdfs:subClassOf
               [ a owl:Restriction ;
@@ -131,15 +133,18 @@
 
 :DesktopSensorFrequency
       a       owl:Class ;
+      :ignoreIndex "true"^^xsd:boolean ;
       rdfs:label "Desktop Sensor Frequency"@en , "Desktopsensorfrequenz"@de ;
       owl:oneOf (:inactive :active :veryActive) .
 
 :DesktopSensorProgram
       a       owl:Class ;
+      :ignoreIndex "true"^^xsd:boolean ;
       rdfs:label "Desktopsensorprogramm"@de , "Desktop Sensor Program"@en ;
       owl:oneOf (:unknown :text :browser) .
 
 :CubeSensorState
       a       owl:Class ;
+      :ignoreIndex "true"^^xsd:boolean ;
       rdfs:label "Cube-Sensorzustand"@de , "Cube Sensor State"@en ;
       owl:oneOf (:shortBreak :longBreak :reading :writing :meeting) .

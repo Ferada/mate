@@ -16,7 +16,17 @@ public final class Mate {
 
   public static final Resource HistoryEntry = resource ("HistoryEntry");
 
+  public static final Property ignoreIndex = property ("ignoreIndex");
+
   public static final Property primaryKey = property ("primaryKey");
+
+  public static final Property extractMode = property ("extractMode");
+
+  public static final Resource explicit = property ("explicit");
+  public static final Resource oneStep = property ("1-step");
+  public static final Resource closure = property ("closure");
+
+  public static final Property extractExplicit = property ("extractExplicit");
 
   public static final Property historyType = property ("historyType");
 
