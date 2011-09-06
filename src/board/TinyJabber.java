@@ -78,16 +78,6 @@ public final class TinyJabber {
       }
     }
 
-    if (type.equals ("mike")) {
-      List<String> tmp = options.nonOptionArguments ();
-      URI uri1 = parseXmppUri (tmp.get (0));
-      URI uri2 = parseXmppUri (tmp.get (1));
-      if (uri1 == null || uri2 == null) {
-	help = true;
-	exit = -1;
-      }
-    }
-
     if (help) {
       String argsString = "[ARGS]...";
       if (!other) {

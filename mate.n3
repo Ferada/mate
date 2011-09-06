@@ -28,6 +28,8 @@
 
 :primaryKey
       a       owl:AnnotationProperty ;
+      rdfs:domain owl:Class ;
+      rdfs:range :PrimaryKey ;
       rdfs:comment """Definiert einen Primärschlüssel der
 	angegebenen Klasse.  Diese Funktion wird von der MATe
 	Whiteboard-Implementierung benutzt um beispielsweise Sensordaten
@@ -95,7 +97,7 @@
 
 :userID
       a       owl:DatatypeProperty ;
-      rdfs:domain :SensorValue ;
+      rdfs:domain owl:Thing ;
       rdfs:range xsd:string ;
       rdfs:label "Benutzer-ID"@de , "user ID"@en ;
       rdfs:comment "ID of the user this value is meant for."@en ,

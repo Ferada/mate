@@ -104,7 +104,7 @@ public class Options {
 		   "sms");
 
 	  map.put (reasonerOpt = acceptsAll (asList ("board.reasoner"), "reasoner implementation")
-		   .withRequiredArg (),
+		   .withRequiredArg ().defaultsTo ("micro"),
 		   "board.reasoner");
 	}
       };
@@ -156,9 +156,8 @@ public class Options {
     mail = Boolean.valueOf (set (mailOpt));
     sms = Boolean.valueOf (set (smsOpt));
 
-    
     if (!reasonerValues.contains (reasoner = set (reasonerOpt))) {
-      logger.error ("reasoner should be one of " + reasonerValues); //writeToString (reasonerValues));
+      logger.error ("reasoner should be one of " + reasonerValues);
       throw new RuntimeException ("invalid value of reasoner '" + reasoner + "'");
     }
   }
@@ -166,10 +165,6 @@ public class Options {
   public synchronized void printHelpOn (OutputStream sink) throws IOException {
     parser.printHelpOn (sink);
   }
-
-  // private String writeToString (List<String> list) {
-  //   StringBuffer
-  // }
 
   /**
    * Returns the singleton of this class.  If you call this before
