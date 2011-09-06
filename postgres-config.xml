@@ -10,4 +10,5 @@
   <entry key="xmpp.password">hub</entry>
   <entry key="mail">false</entry>
   <entry key="sms">false</entry>
+  <entry key="languages">en,de</entry>
 </properties>

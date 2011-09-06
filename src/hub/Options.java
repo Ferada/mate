@@ -19,7 +19,7 @@ public class Options {
 
   public OptionParser parser;
 
-  private static final List<String> reasonerValues = asList ("micro", "mini", "full");
+  private static final List<String> reasonerValues = asList ("none", "micro", "mini", "full");
 
   private ArgumentAcceptingOptionSpec<File> confOpt;
   private ArgumentAcceptingOptionSpec<String> xmppServerOpt;
@@ -32,6 +32,7 @@ public class Options {
   private ArgumentAcceptingOptionSpec<String> mailOpt;
   private ArgumentAcceptingOptionSpec<String> smsOpt;
   private ArgumentAcceptingOptionSpec<String> reasonerOpt;
+  private ArgumentAcceptingOptionSpec<String> languagesOpt;
 
   private Map<ArgumentAcceptingOptionSpec, String> map;
 
@@ -51,6 +52,7 @@ public class Options {
   public boolean mail;
   public boolean sms;
   public String reasoner;
+  public List<String> languages;
 
   private Options () {
     map = new HashMap<ArgumentAcceptingOptionSpec, String> ();
@@ -104,8 +106,12 @@ public class Options {
 		   "sms");
 
 	  map.put (reasonerOpt = acceptsAll (asList ("board.reasoner"), "reasoner implementation")
-		   .withRequiredArg ().defaultsTo ("micro"),
+		   .withRequiredArg ().defaultsTo ("full"),
 		   "board.reasoner");
+
+	  map.put (languagesOpt = acceptsAll (asList ("languages"), "language preferences for ontology meta-information")
+		   .withRequiredArg ().withValuesSeparatedBy (','),
+		   "languages");
 	}
       };
   }
@@ -120,6 +126,19 @@ public class Options {
     String result = set.valueOf (spec);
     logger.trace (name + " = " + result);
     return result;
+  }
+
+  private List<String> setList (ArgumentAcceptingOptionSpec<String> spec, String separator) {
+    String name = map.get (spec);
+    if (!set.has (spec)) {
+      String value = properties.getProperty (name);
+      if (value != null)
+	spec.defaultsTo (value);
+    }
+    List<String> result = set.valuesOf (spec);
+    logger.trace (name + " = " + result);
+    return result;
+
   }
 
   public synchronized void parse (String args[]) throws Exception {
@@ -159,6 +178,12 @@ public class Options {
     if (!reasonerValues.contains (reasoner = set (reasonerOpt))) {
       logger.error ("reasoner should be one of " + reasonerValues);
       throw new RuntimeException ("invalid value of reasoner '" + reasoner + "'");
+    }
+
+    languages = setList (languagesOpt, ",");
+    if (languages.isEmpty ()) {
+      logger.error ("languages is empty, defaulting to 'en'");
+      languages = asList ("en");
     }
   }
 

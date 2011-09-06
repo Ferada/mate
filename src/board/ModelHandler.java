@@ -48,10 +48,13 @@ public class ModelHandler implements HttpHandler {
 	writer.write ("<!DOCTYPE html>\n" +
 		      "<html lang='en'>" +
 		      "<head><meta charset='utf-8'/><title>MATe model</title></head>" +
-		      "<body>");
+		      "<body><ul>");
+	StmtIterator it = model.listStatements ();
+	while (it.hasNext ())
+	  writer.write ("<li>" + it.nextStatement () + "</li>");
 	// for (Map.Entry<String, MateClass> entry : ontology.classes.entrySet ())
 	//   writer.write ("<li><a>" + entry.getValue ().base.getLabel (null) + "</a></li>");
-	writer.write ("</body></html>");
+	writer.write ("<ul></body></html>");
       }
       else
 	model.write (writer, language);

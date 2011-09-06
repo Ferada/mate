@@ -206,9 +206,22 @@ public class Whiteboard implements Board, Runnable {
       reasoner = ReasonerRegistry.getOWLMiniReasoner ();
     else if (string.equals ("full"))
       reasoner = ReasonerRegistry.getOWLReasoner ();
+    /* well, this is redundant */
+    else if (string.equals ("none"))
+       reasoner = null;
 
-    mateReasoner = reasoner.bindSchema (mateOntology.model);
-    sensorReasoner = reasoner.bindSchema (sensorOntology.model);
+    if (reasoner != null) {
+      mateReasoner = reasoner.bindSchema (mateOntology.model);
+      sensorReasoner = reasoner.bindSchema (sensorOntology.model);
+    }
+
+    try {
+      runWebServer ();
+    }
+    catch (IOException e) {
+      logger.error ("couldn't run web server: " + e);
+      logger.error (writeToString (e));
+    }
   }
 
   /**
@@ -311,21 +324,23 @@ public class Whiteboard implements Board, Runnable {
     }
 
     thread.join ();
+  }
 
+  private void runWebServer () throws IOException {
     int port = 8000;
     InetSocketAddress addr = new InetSocketAddress (port);
     HttpServer server = HttpServer.create (addr, 0);
 
-    server.createContext ("/", new IndexHandler (board));
-    server.createContext ("/mate", new OntologyHandler (board.mateOntology));
-    server.createContext ("/mate/sensors", new OntologyHandler (board.sensorOntology));
-    server.createContext ("/world", new ModelHandler (board.worldModel));
-    server.createContext ("/sensors", new ModelHandler (board.sensorValues));
-    server.createContext ("/history", new ModelHandler (board.historyValues));
+    server.createContext ("/", new IndexHandler (this));
+    server.createContext ("/mate", new OntologyHandler (mateOntology));
+    server.createContext ("/mate/sensors", new OntologyHandler (sensorOntology));
+    server.createContext ("/world", new ModelHandler (worldModel));
+    server.createContext ("/sensors", new ModelHandler (sensorValues));
+    server.createContext ("/history", new ModelHandler (historyValues));
     server.setExecutor (Executors.newCachedThreadPool());
     server.start ();
 
-    logger.info ("Server is listening on port " + port);
+    logger.info ("server is listening on port " + port);
   }
 
   public void registerClient (Client client) {
@@ -395,6 +410,7 @@ public class Whiteboard implements Board, Runnable {
 	logger.warn (it.next ().toString ());
       else
 	logger.error (it.next ().toString ());
+    logger.trace (writeToString (model));
     // return valid;
     return false;
   }
@@ -547,7 +563,7 @@ public class Whiteboard implements Board, Runnable {
   }
 
   public void postWorldUpdate (Client poster, Model model) {
-    if (!isConsistent (mateOntology, mateReasoner, model)) {
+    if (mateReasoner != null && !isConsistent (mateOntology, mateReasoner, model)) {
       logger.warn ("update isn't consistent with respect to the mate ontology, discarding");
       return;
     }
@@ -568,7 +584,7 @@ public class Whiteboard implements Board, Runnable {
   }
 
   public void postSensorUpdate (Model model) {
-    if (!isConsistent (sensorOntology, sensorReasoner, model)) {
+    if (sensorReasoner != null && !isConsistent (sensorOntology, sensorReasoner, model)) {
       logger.warn ("update isn't consistent with respect to the sensor ontology, discarding");
       return;
     }
@@ -856,17 +872,18 @@ public class Whiteboard implements Board, Runnable {
   }
 
   public QueryExecution query (Query query) {
-    /* default graph goes over the union of these graphs */
-    Graph graphs[] = {worldModel.getGraph (), sensorValues.getGraph (), historyValues.getGraph ()};
-    MultiUnion union = new MultiUnion (graphs);
-    /* but updates only go to world */
-    union.setBaseGraph (graphs[0]);
+    // /* default graph goes over the union of these graphs */
+    // Graph graphs[] = {worldModel.getGraph (), sensorValues.getGraph (), historyValues.getGraph ()};
+    // MultiUnion union = new MultiUnion (graphs);
+    // /* but updates only go to world */
+    // union.setBaseGraph (graphs[0]);
 
     /* wrong, because it would return a new independent model */
     // Model union = worldModel.union (sensorValues).union (historyValues);
 
     DataSource source = DatasetFactory.create ();
-    source.setDefaultModel (ModelFactory.createModelForGraph (union));
+    // source.setDefaultModel (ModelFactory.createModelForGraph (union));
+    source.setDefaultModel (ModelFactory.createDefaultModel ());
     source.addNamedModel ("http://www.imis.uni-luebeck.de/mate/graphs#world", worldModel);
     source.addNamedModel ("http://www.imis.uni-luebeck.de/mate/graphs#sensor", sensorValues);
     source.addNamedModel ("http://www.imis.uni-luebeck.de/mate/graphs#history", historyValues);

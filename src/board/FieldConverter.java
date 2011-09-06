@@ -88,10 +88,12 @@ public class FieldConverter {
     final String queryString = "PREFIX rdf: <" + RDF.getURI () + "> "
       + "PREFIX mate: <" + Mate.prefix + "> "
       + "SELECT ?marker ?value ?type ?property ?user "
-      + "FROM NAMED <" + Mate.uri + "/graphs#world> WHERE {"
+      + "WHERE {"
+      + "GRAPH <" + Mate.uri + "/graphs#world> {"
       + "?marker rdf:type ?type . "
       + "?marker ?property ?value . "
       + "?marker mate:userID ?user . "
+      + "}"
       + "}";
     Query query = QueryFactory.create (queryString);
     query.setPrefixMapping (whiteboard.prefixes);

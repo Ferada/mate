@@ -141,7 +141,7 @@
       a       owl:Class ;
       :ignoreIndex "true"^^xsd:boolean ;
       rdfs:label "Activity"@en , "Aktivität"@de ;
-      owl:oneOf (:shortBreak :longBreak :reading :writing :meeting) .
+      owl:oneOf (:shortBreak :longBreak :reading :writing :meeting :unknown) .
 
 :ActivityValue
       a       owl:Class ;
