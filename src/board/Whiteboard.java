@@ -23,7 +23,11 @@ import com.hp.hpl.jena.vocabulary.XSD;
 import com.hp.hpl.jena.vocabulary.OWL;
 
 import java.net.*;
-import com.sun.net.httpserver.*;
+
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.*;
+
+import de.fuberlin.wiwiss.d2rq.*;
 
 import java.io.*;
 import java.util.*;
@@ -123,6 +127,11 @@ public class Whiteboard implements Board, Runnable {
    */
   private Map<String, Combiner> combiners;
 
+  /**
+   *
+   */
+  public Model legacyModel;  
+
   public Whiteboard (Options options) throws FileNotFoundException {
     reset (options);
   }
@@ -163,6 +172,12 @@ public class Whiteboard implements Board, Runnable {
        ...
        mateOntology = FileManaget.get ().loadModel (Mate.prefix ...)
     */
+    FileManager manager = FileManager.get ();
+    Iterator<Locator> it = manager.locators ();
+    while (it.hasNext ()) {
+      logger.info ("locator " + it.next ().getName ());
+    }    
+
     mateOntology = loadOntology ("mate.n3", "N3");
     /* maps the mateOntology object to the URI, */
     /* TODO: except this doesn't work as expected, i.e. the model is probably copied */
@@ -215,10 +230,15 @@ public class Whiteboard implements Board, Runnable {
       sensorReasoner = reasoner.bindSchema (sensorOntology.model);
     }
 
+    org.apache.log4j.Logger.getLogger ("de.fuberlin.wiwiss.d2rq").setLevel(org.apache.log4j.Level.ALL);
+
+    /* Set up the ModelD2RQ using a mapping file */
+    legacyModel = new ModelD2RQ ("file:d2rq.n3");
+
     try {
       runWebServer ();
     }
-    catch (IOException e) {
+    catch (Exception e) {
       logger.error ("couldn't run web server: " + e);
       logger.error (writeToString (e));
     }
@@ -326,18 +346,21 @@ public class Whiteboard implements Board, Runnable {
     thread.join ();
   }
 
-  private void runWebServer () throws IOException {
+  private void runWebServer () throws Exception {
     int port = 8000;
-    InetSocketAddress addr = new InetSocketAddress (port);
-    HttpServer server = HttpServer.create (addr, 0);
 
-    server.createContext ("/", new IndexHandler (this));
-    server.createContext ("/mate", new OntologyHandler (mateOntology));
-    server.createContext ("/mate/sensors", new OntologyHandler (sensorOntology));
-    server.createContext ("/world", new ModelHandler (worldModel));
-    server.createContext ("/sensors", new ModelHandler (sensorValues));
-    server.createContext ("/history", new ModelHandler (historyValues));
-    server.setExecutor (Executors.newCachedThreadPool());
+    Server server = new Server (port);
+    ServletContextHandler context = new ServletContextHandler (ServletContextHandler.NO_SESSIONS);
+    context.setContextPath ("/");
+    server.setHandler (context);
+
+    context.addServlet (new ServletHolder (new IndexServlet (this)), "/*");
+    context.addServlet (new ServletHolder (new OntologyServlet (mateOntology)), "/mate/*");
+    context.addServlet (new ServletHolder (new OntologyServlet (sensorOntology)), "/mate/sensors/*");
+    context.addServlet (new ServletHolder (new ModelServlet (worldModel)), "/world/*");
+    context.addServlet (new ServletHolder (new ModelServlet (sensorValues)), "/sensors/*");
+    context.addServlet (new ServletHolder (new ModelServlet (historyValues)), "/history/*");
+
     server.start ();
 
     logger.info ("server is listening on port " + port);
