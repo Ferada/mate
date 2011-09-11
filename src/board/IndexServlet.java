@@ -23,6 +23,7 @@ public class IndexServlet extends HttpServlet {
 				 "<html lang='en'>" +
 				 "<head><meta charset='utf-8'/><title>MATe Awareness Hub</title></head>" +
 				 "<body><ul>" +
+				 "<li><a href='/query'>Query SPARQL</a></li>" +
 				 "<li><a href='/mate'>MATe ontology</a></li>" +
 				 "<li><a href='/mate/sensors'>MATe sensors ontology</a></li>" +
 				 "<li><a href='/world/.n3'>World knowledge data store (N3)</a></li>" +
