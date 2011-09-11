@@ -19,6 +19,7 @@ import com.hp.hpl.jena.sparql.syntax.*;
 import com.hp.hpl.jena.sparql.modify.request.*;
 
 import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
 import com.hp.hpl.jena.vocabulary.OWL;
 
@@ -143,10 +144,12 @@ public class Whiteboard implements Board, Runnable {
   public void reset (Options options) throws FileNotFoundException {
     prefixes = PrefixMapping.Factory.create ();
     prefixes.setNsPrefix ("rdf", RDF.getURI ());
+    prefixes.setNsPrefix ("rdfs", RDFS.getURI ());
     prefixes.setNsPrefix ("xsd", XSD.getURI ());
     prefixes.setNsPrefix ("owl", OWL.getURI ());
     prefixes.setNsPrefix ("mate", Mate.prefix);
     prefixes.setNsPrefix ("sensors", Sensors.prefix);
+    prefixes.setNsPrefix ("legacy", Legacy.prefix);
     ModelFactory.setDefaultModelPrefixes (prefixes);
 
     worldModel = ModelFactory.createDefaultModel ();
@@ -234,6 +237,7 @@ public class Whiteboard implements Board, Runnable {
 
     /* Set up the ModelD2RQ using a mapping file */
     legacyModel = new ModelD2RQ ("file:d2rq.n3");
+    legacyModel.setNsPrefixes (worldModel);
 
     try {
       runWebServer ();
@@ -360,6 +364,8 @@ public class Whiteboard implements Board, Runnable {
     context.addServlet (new ServletHolder (new ModelServlet (worldModel)), "/world/*");
     context.addServlet (new ServletHolder (new ModelServlet (sensorValues)), "/sensors/*");
     context.addServlet (new ServletHolder (new ModelServlet (historyValues)), "/history/*");
+    context.addServlet (new ServletHolder (new ModelServlet (legacyModel)), "/legacy/*");
+    context.addServlet (new ServletHolder (new QueryServlet (this)), "/query/*");
 
     server.start ();
 
@@ -403,14 +409,6 @@ public class Whiteboard implements Board, Runnable {
       privateStores.put (client, result);
     }
     return result;
-  }
-
-  public void registerClientPattern (String pattern, Client client) {
-
-  }
-
-  public void unregisterClientPattern (String pattern, Client client) {
-
   }
 
   /**
@@ -916,6 +914,10 @@ public class Whiteboard implements Board, Runnable {
 
   public QueryExecution query (String query) {
     return query (QueryFactory.create (query));
+  }
+
+  public PrefixMapping getDefaultPrefixMapping () {
+    return prefixes;
   }
 
   public static String writeToString (Model model) {
