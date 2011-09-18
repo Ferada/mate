@@ -9,6 +9,11 @@ import org.eclipse.jetty.servlet.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
+/**
+ * Implements access to ontology models, i.e. output to HTML and RDF
+ * XML/N3 output.  Accessing the different output methods is done via
+ * a filename postfix, e.g. '.n3'.
+ */
 public class OntologyServlet extends HttpServlet {
   public MateOntology ontology;
 
@@ -51,7 +56,7 @@ public class OntologyServlet extends HttpServlet {
 		    "<head><meta charset='utf-8'/><title>MATe ontology</title></head>" +
 		    "<body>Known MATe classes:<ul>");
       for (Map.Entry<String, MateClass> entry : ontology.classes.entrySet ())
-	writer.write ("<li><a>" + entry.getValue ().base.getLabel (null) + "</a></li>");
+	writer.write ("<li><a>" + Whiteboard.getLocalizedLabel (entry.getValue ().base) + "</a></li>");
       writer.write ("</ul></body></html>");
     }
     else

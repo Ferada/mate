@@ -33,6 +33,7 @@ public class Options {
   private ArgumentAcceptingOptionSpec<String> smsOpt;
   private ArgumentAcceptingOptionSpec<String> reasonerOpt;
   private ArgumentAcceptingOptionSpec<String> languagesOpt;
+  private ArgumentAcceptingOptionSpec<String> webPortOpt;
 
   private Map<ArgumentAcceptingOptionSpec, String> map;
 
@@ -53,6 +54,7 @@ public class Options {
   public boolean sms;
   public String reasoner;
   public List<String> languages;
+  public int webPort;
 
   private Options () {
     map = new HashMap<ArgumentAcceptingOptionSpec, String> ();
@@ -112,6 +114,10 @@ public class Options {
 	  map.put (languagesOpt = acceptsAll (asList ("languages"), "language preferences for ontology meta-information")
 		   .withRequiredArg ().withValuesSeparatedBy (','),
 		   "languages");
+
+	  map.put (webPortOpt = acceptsAll (asList ("web.port"), "port for the web server")
+		   .withRequiredArg (),
+		   "web.port");
 	}
       };
   }
@@ -175,15 +181,19 @@ public class Options {
     mail = Boolean.valueOf (set (mailOpt));
     sms = Boolean.valueOf (set (smsOpt));
 
-    if (!reasonerValues.contains (reasoner = set (reasonerOpt))) {
-      logger.error ("reasoner should be one of " + reasonerValues);
-      throw new RuntimeException ("invalid value of reasoner '" + reasoner + "'");
-    }
+    if (!reasonerValues.contains (reasoner = set (reasonerOpt)))
+      throw new RuntimeException ("invalid value of reasoner '" + reasoner +
+				  "', should be one of " + reasonerValues);
 
     languages = setList (languagesOpt, ",");
-    if (languages.isEmpty ()) {
-      logger.error ("languages is empty, defaulting to 'en'");
-      languages = asList ("en");
+    if (languages.isEmpty ())
+      throw new RuntimeException ("languages is empty");
+
+    try {
+      webPort = Integer.valueOf (set (webPortOpt)).intValue ();
+    }
+    catch (NumberFormatException e) {
+      throw new RuntimeException ("web port should be a number", e);
     }
   }
 

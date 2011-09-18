@@ -217,7 +217,7 @@ public class Whiteboard implements Board, Runnable {
 
     combiners = new HashMap<String, Combiner> ();
 
-    String string = Options.getInstance ().reasoner;
+    String string = options.reasoner;
     if (string.equals ("micro"))
       reasoner = ReasonerRegistry.getOWLMicroReasoner ();
     else if (string.equals ("mini"))
@@ -233,14 +233,16 @@ public class Whiteboard implements Board, Runnable {
       sensorReasoner = reasoner.bindSchema (sensorOntology.model);
     }
 
-    org.apache.log4j.Logger.getLogger ("de.fuberlin.wiwiss.d2rq").setLevel(org.apache.log4j.Level.ALL);
+    /* TODO: d2rq doesn't use slf4j; nevertheless this needs a configuration option */
+    org.apache.log4j.Logger.getLogger ("de.fuberlin.wiwiss.d2rq").setLevel (org.apache.log4j.Level.ALL);
 
     /* Set up the ModelD2RQ using a mapping file */
     legacyModel = new ModelD2RQ ("file:d2rq.n3");
     legacyModel.setNsPrefixes (worldModel);
 
     try {
-      runWebServer ();
+      /* it's no error if this doesn't work though */
+      runWebServer (options.webPort);
     }
     catch (Exception e) {
       logger.error ("couldn't run web server: " + e);
@@ -350,9 +352,11 @@ public class Whiteboard implements Board, Runnable {
     thread.join ();
   }
 
-  private void runWebServer () throws Exception {
-    int port = 8000;
-
+  /**
+   * Runs a web server for displaying information and allowing SPARQL/UL
+   * access to stored information.
+   */
+  private void runWebServer (int port) throws Exception {
     Server server = new Server (port);
     ServletContextHandler context = new ServletContextHandler (ServletContextHandler.NO_SESSIONS);
     context.setContextPath ("/");
@@ -372,27 +376,37 @@ public class Whiteboard implements Board, Runnable {
     logger.info ("server is listening on port " + port);
   }
 
-  public void registerClient (Client client) {
+  public synchronized void registerClient (Client client) {
     clients.add (client);
   }
 
-  public void unregisterClient (Client client) {
+  public synchronized void unregisterClient (Client client) {
     clients.remove (client);
     privateModels.remove (client);
   }
 
-  public void registerCombiner (String uri, Combiner combiner) {
+  public synchronized void registerCombiner (String uri, Combiner combiner) {
     combiners.put (uri, combiner);
   }
 
-  public void unregisterCombiner (String uri) {
+  public synchronized void unregisterCombiner (String uri) {
     combiners.remove (uri);
   }
 
+  /**
+   * Retrieves one of the registered combination methods by name.
+   * @param uri The previously registered URI string.
+   * @see #registerCombiner
+   */
   private Combiner getCombiner (String uri) {
     return combiners.get (uri);
   }
 
+  /**
+   * Retrieves the private model for a client.  The model is created on
+   * demand if it didn't previously exist.
+   * @see #getPrivateStore
+   */
   private Model getPrivateModel (Client client) {
     Model result = privateModels.get (client);
     if (result == null) {
@@ -402,6 +416,11 @@ public class Whiteboard implements Board, Runnable {
     return result;
   }
 
+  /**
+   * Retrieves the update interface, i.e. store, for a private model of a
+   * client.  The store is created on demand if it didn't previously exist.
+   * @see #getPrivateModel
+   */
   private GraphStore getPrivateStore (Client client) {
     GraphStore result = privateStores.get (client);
     if (result == null) {
@@ -413,7 +432,11 @@ public class Whiteboard implements Board, Runnable {
 
   /**
    * Checks whether a model is consistent with respect to the given
-   * ontology.
+   * ontology.  This works by using the {@link InfModel#validate} method of
+   * the ontology model and checking the result using
+   * {@link ValidityResult#isClean}.  Although some of the errors may just
+   * be warnings, we consider them as errors.  This is method is
+   * particularly slow, so using it is suggested only for testing purposes.
    */
   public boolean isConsistent (MateOntology ontology, com.hp.hpl.jena.reasoner.Reasoner reasoner, Model model) {
     // consistency checking on every posted model
@@ -432,7 +455,6 @@ public class Whiteboard implements Board, Runnable {
       else
 	logger.error (it.next ().toString ());
     logger.trace (writeToString (model));
-    // return valid;
     return false;
   }
 
@@ -468,13 +490,6 @@ public class Whiteboard implements Board, Runnable {
     }
 
     return result;
-  }
-
-  /**
-   * Pushes the item on the RDF list.
-   */
-  public void pushToRdfList (Resource listHead, Resource item) {
-    /* listHead has to be of type */
   }
 
   private List<Triple> primaryKeyCheckTriples (Var var, Resource marker, MateClass klass) {
@@ -542,7 +557,7 @@ public class Whiteboard implements Board, Runnable {
     }
   }
 
-  public List<Model> matching (Model test, Resource marker, MateClass klass) {
+  public synchronized List<Model> matching (Model test, Resource marker, MateClass klass) {
     List<Model> result = new ArrayList<Model> ();
 
     final String queryString = "SELECT ?marker WHERE {}";
@@ -583,7 +598,7 @@ public class Whiteboard implements Board, Runnable {
     return result;
   }
 
-  public void postWorldUpdate (Client poster, Model model) {
+  public synchronized void postWorldUpdate (Client poster, Model model) {
     if (mateReasoner != null && !isConsistent (mateOntology, mateReasoner, model)) {
       logger.warn ("update isn't consistent with respect to the mate ontology, discarding");
       return;
@@ -604,7 +619,7 @@ public class Whiteboard implements Board, Runnable {
     logger.trace ("===");
   }
 
-  public void postSensorUpdate (Model model) {
+  public synchronized void postSensorUpdate (Model model) {
     if (sensorReasoner != null && !isConsistent (sensorOntology, sensorReasoner, model)) {
       logger.warn ("update isn't consistent with respect to the sensor ontology, discarding");
       return;
@@ -892,7 +907,13 @@ public class Whiteboard implements Board, Runnable {
     logger.trace ("---");
   }
 
-  public QueryExecution query (Query query) {
+  /**
+   * Returns an {@link QueryExecution} object for execution by the caller.
+   * All processing has to be done with a lock held around the whiteboard
+   * object, i.e.
+   * <code>synchronized (Whiteboard.getInstance ()) { &hellip; }</code>.
+   */
+  public synchronized QueryExecution query (Query query) {
     // /* default graph goes over the union of these graphs */
     // Graph graphs[] = {worldModel.getGraph (), sensorValues.getGraph (), historyValues.getGraph ()};
     // MultiUnion union = new MultiUnion (graphs);
@@ -912,7 +933,7 @@ public class Whiteboard implements Board, Runnable {
     return QueryExecutionFactory.create (query, source);
   }
 
-  public QueryExecution query (String query) {
+  public synchronized QueryExecution query (String query) {
     return query (QueryFactory.create (query));
   }
 
@@ -980,6 +1001,9 @@ public class Whiteboard implements Board, Runnable {
     return "Whiteboard";
   }
 
+  /**
+   * A first attempt to support <code>xmpp:</code>-style URIs.
+   */
   public static URI parseXmppUri (String string) {
     try {
       URI uri = new URI (string);
@@ -992,63 +1016,26 @@ public class Whiteboard implements Board, Runnable {
 
       /* TODO: it'd be nice to have an actual XMPPURI class so we can do
 	 more stuff on it, but that'll have to wait */
-      // String nodeid = null, host = null, resid = null, query = null, fragment = null;
-
-      // String split = uri.getSchemeSpecificPart ();
-      // String parts[];
-
-      // parts = split.split ("#");
-
-      // if (parts.length == 2) {
-      // 	fragment = parts[1];
-      // 	split = parts[0];
-      // }
-      // else if (parts.length > 2)
-      // 	throw new URISyntaxException (string, "more than one '#' separator");
-
-      // parts = split.split ("\\?");
-
-      // if (parts.length == 2) {
-      // 	query = parts[1];
-      // 	split = parts[0];
-      // }
-      // else if (parts.length > 2)
-      // 	throw new URISyntaxException (string, "more than one '?' separator");      
-
-      // parts = split.split ("/");
-
-      // if (parts.length == 2) {
-      // 	resid = parts[1];
-      // 	split = parts[0];
-      // }
-      // else if (parts.length > 2)
-      // 	throw new URISyntaxException (string, "more than one '/' separator");
-
-      // parts = split.split ("@");
-
-      // if (parts.length == 1)
-      // 	host = parts[0];
-      // else if (parts.length == 2) {
-      // 	nodeid = parts[0];
-      // 	host = parts[1];
-      // }
-      // else
-      // 	throw new URISyntaxException (string, "more than one '@' separator");
-      
-      // logger.info ("scheme = " + scheme);
-      // logger.info ("nodeid = " + nodeid);
-      // logger.info ("host = " + host);
-      // logger.info ("resid = " + resid);
-      // logger.info ("query = " + query);
-      // logger.info ("fragment = " + fragment);
-      
-      // return new URI (scheme, nodeid, host, -1, (resid == null) ? null : ("/" + resid), query, fragment);
-
       return uri;
     }
     catch (URISyntaxException e) {
       System.out.println ("couldn't parse URI '" + string + "': " + e);
       throw new RuntimeException (e);
     }
+  }
+
+  /**
+   * Returns the most appropriate label via the {@link Options} property
+   * {@link Options#languages}.  If everything fails,
+   * {@link OntResource#getLabel} is called with a <code>null</code>
+   * argument to check for an unmarked label.
+   */
+  public static String getLocalizedLabel (OntResource resource) {
+    for (String language : Options.getInstance ().languages) {
+      String label = resource.getLabel (language);
+      if (label != null)
+	return label;
+    }
+    return resource.getLabel (null);
   }
 }

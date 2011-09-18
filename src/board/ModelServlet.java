@@ -11,6 +11,11 @@ import javax.servlet.http.*;
 
 import com.hp.hpl.jena.rdf.model.*;
 
+/**
+ * Implements access to models, i.e. output to HTML and RDF XML/N3 output.
+ * Accessing the different output methods is done via a filename postfix,
+ * e.g. '.n3'.
+ */
 public class ModelServlet extends HttpServlet {
   public Model model;
 
@@ -53,10 +58,9 @@ public class ModelServlet extends HttpServlet {
 		    "<head><meta charset='utf-8'/><title>MATe model</title></head>" +
 		    "<body><ul>");
       StmtIterator it = model.listStatements ();
+      /* TODO: well, this could be prettier */
       while (it.hasNext ())
 	writer.write ("<li>" + it.nextStatement () + "</li>");
-      // for (Map.Entry<String, MateClass> entry : ontology.classes.entrySet ())
-      //   writer.write ("<li><a>" + entry.getValue ().base.getLabel (null) + "</a></li>");
       writer.write ("<ul></body></html>");
     }
     else

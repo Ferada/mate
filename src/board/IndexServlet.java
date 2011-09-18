@@ -8,6 +8,10 @@ import javax.servlet.http.*;
 import java.io.*;
 import java.util.*;
 
+/**
+ * This displays the entry page for our awesome debugging and showcase
+ * web server.  At the moment the response is hardcoded.
+ */
 public class IndexServlet extends HttpServlet {
   public Board board;
 

@@ -113,11 +113,8 @@ public class MateClass {
   }
 
   public String toString () {
-    String label = base.getLabel (null);
-    if (label == null)
-      return "MateClass<" + base.getLocalName () + ">";
-    else
-      return "MateClass<" + label + ">";
+    String label = Whiteboard.getLocalizedLabel (base);
+    return "MateClass<" + ((label == null) ? base.getLocalName () : label) + ">";
   }
 
   /**

@@ -14,12 +14,13 @@ public interface Board {
   /**
    * Adds a client to the list of registered clients.
    * @see Client#postUpdate
+   * @see #unregisterClient
    */
   public void registerClient (Client client);
 
   /**
    * Removes a client from the list of registered clients.
-   * @see #registerClientPattern
+   * @see #registerClient
    */
   public void unregisterClient (Client client);
 
@@ -57,5 +58,27 @@ public interface Board {
    */
   public List<Model> matching (Model test, Resource marker, MateClass klass);
 
+  /**
+   * Returns a default prefix mapping for the board.  Useful for information
+   * purposes only, since you should already query through {@link #query},
+   * which uses this mapping to set up the query.  At the moment this value
+   * is set up during the construction of the object and therefore not
+   * subject to modification.
+   */
   public PrefixMapping getDefaultPrefixMapping ();
+
+  /**
+   * Registers a new combination method for the OWL class with the given URI.
+   * @param uri The type as an URI string.
+   * @param combiner The combination method.
+   * @see #unregisterCombiner
+   */
+  public void registerCombiner (String uri, Combiner combiner);
+
+  /**
+   * Removes the combination method for the OWL class with the given URI.
+   * @param uri The type as an URI string.
+   * @see #registerCombiner
+   */
+  public void unregisterCombiner (String uri);
 }
