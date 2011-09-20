@@ -15,9 +15,12 @@ import javax.servlet.http.*;
  * a filename postfix, e.g. '.n3'.
  */
 public class OntologyServlet extends HttpServlet {
+  public Board board;
+
   public MateOntology ontology;
 
-  public OntologyServlet (MateOntology ontology) {
+  public OntologyServlet (Board board, MateOntology ontology) {
+    this.board = board;
     this.ontology = ontology;
   }
 
@@ -50,16 +53,18 @@ public class OntologyServlet extends HttpServlet {
 
     Writer writer = response.getWriter ();
 
-    if (htmlOutput) {
-      writer.write ("<!DOCTYPE html>\n" +
-		    "<html lang='en'>" +
-		    "<head><meta charset='utf-8'/><title>MATe ontology</title></head>" +
-		    "<body>Known MATe classes:<ul>");
-      for (Map.Entry<String, MateClass> entry : ontology.classes.entrySet ())
-	writer.write ("<li><a>" + Whiteboard.getLocalizedLabel (entry.getValue ().base) + "</a></li>");
-      writer.write ("</ul></body></html>");
+    synchronized (board) {
+      if (htmlOutput) {
+	writer.write ("<!DOCTYPE html>\n" +
+		      "<html lang='en'>" +
+		      "<head><meta charset='utf-8'/><title>MATe ontology</title></head>" +
+		      "<body>Known MATe classes:<ul>");
+	for (Map.Entry<String, MateClass> entry : ontology.classes.entrySet ())
+	  writer.write ("<li><a>" + Whiteboard.getLocalizedLabel (entry.getValue ().base) + "</a></li>");
+	writer.write ("</ul></body></html>");
+      }
+      else
+	ontology.model.write (writer, language);
     }
-    else
-      ontology.model.write (writer, language);
   }
 }

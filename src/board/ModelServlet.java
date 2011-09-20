@@ -17,9 +17,12 @@ import com.hp.hpl.jena.rdf.model.*;
  * e.g. '.n3'.
  */
 public class ModelServlet extends HttpServlet {
+  public Board board;
+
   public Model model;
 
-  public ModelServlet (Model model) {
+  public ModelServlet (Board board, Model model) {
+    this.board = board;
     this.model = model;
   }
 
@@ -52,18 +55,20 @@ public class ModelServlet extends HttpServlet {
 
     Writer writer = response.getWriter ();
 
-    if (htmlOutput) {
-      writer.write ("<!DOCTYPE html>\n" +
-		    "<html lang='en'>" +
-		    "<head><meta charset='utf-8'/><title>MATe model</title></head>" +
-		    "<body><ul>");
-      StmtIterator it = model.listStatements ();
-      /* TODO: well, this could be prettier */
-      while (it.hasNext ())
-	writer.write ("<li>" + it.nextStatement () + "</li>");
-      writer.write ("<ul></body></html>");
+    synchronized (board) {
+      if (htmlOutput) {
+	writer.write ("<!DOCTYPE html>\n" +
+		      "<html lang='en'>" +
+		      "<head><meta charset='utf-8'/><title>MATe model</title></head>" +
+		      "<body><ul>");
+	StmtIterator it = model.listStatements ();
+	/* TODO: well, this could be prettier */
+	while (it.hasNext ())
+	  writer.write ("<li>" + it.nextStatement () + "</li>");
+	writer.write ("<ul></body></html>");
+      }
+      else
+	model.write (writer, language);
     }
-    else
-      model.write (writer, language);
   }
 }

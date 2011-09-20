@@ -363,12 +363,12 @@ public class Whiteboard implements Board, Runnable {
     server.setHandler (context);
 
     context.addServlet (new ServletHolder (new IndexServlet (this)), "/*");
-    context.addServlet (new ServletHolder (new OntologyServlet (mateOntology)), "/mate/*");
-    context.addServlet (new ServletHolder (new OntologyServlet (sensorOntology)), "/mate/sensors/*");
-    context.addServlet (new ServletHolder (new ModelServlet (worldModel)), "/world/*");
-    context.addServlet (new ServletHolder (new ModelServlet (sensorValues)), "/sensors/*");
-    context.addServlet (new ServletHolder (new ModelServlet (historyValues)), "/history/*");
-    context.addServlet (new ServletHolder (new ModelServlet (legacyModel)), "/legacy/*");
+    context.addServlet (new ServletHolder (new OntologyServlet (this, mateOntology)), "/mate/*");
+    context.addServlet (new ServletHolder (new OntologyServlet (this, sensorOntology)), "/mate/sensors/*");
+    context.addServlet (new ServletHolder (new ModelServlet (this, worldModel)), "/world/*");
+    context.addServlet (new ServletHolder (new ModelServlet (this, sensorValues)), "/sensors/*");
+    context.addServlet (new ServletHolder (new ModelServlet (this, historyValues)), "/history/*");
+    context.addServlet (new ServletHolder (new ModelServlet (this, legacyModel)), "/legacy/*");
     context.addServlet (new ServletHolder (new QueryServlet (this)), "/query/*");
 
     server.start ();

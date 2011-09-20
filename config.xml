@@ -11,4 +11,5 @@
   <entry key="mail">false</entry>
   <entry key="sms">false</entry>
   <entry key="languages">en,de</entry>
+  <entry key="web.port">8000</entry>
 </properties>

@@ -116,30 +116,33 @@ public class FieldConverter {
     bindings.add ("property", property);
     bindings.add ("user", user);
 
-    QueryExecution exec = whiteboard.query (query);
-    exec.setInitialBinding (bindings);
-
-    logger.trace ("exec = " + exec);
-
     String result = null;
-    try {
-      ResultSet results = exec.execSelect ();
-      while (results.hasNext ()) {
-	QuerySolution solution = results.next ();
 
-	logger.trace ("solution " + solution);
+    synchronized (whiteboard) {
+      QueryExecution exec = whiteboard.query (query);
+      exec.setInitialBinding (bindings);
 
-	RDFNode value = solution.get ("value");
-	if (value.isLiteral ())
-	  result = value.asLiteral ().getValue ().toString ();
-	else if (value.isURIResource ())
-	  result = value.asResource ().getLocalName ();
-	else
-	  logger.error ("value binding was an anonymous node, ignoring");
+      logger.trace ("exec = " + exec);
+
+      try {
+	ResultSet results = exec.execSelect ();
+	while (results.hasNext ()) {
+	  QuerySolution solution = results.next ();
+
+	  logger.trace ("solution " + solution);
+
+	  RDFNode value = solution.get ("value");
+	  if (value.isLiteral ())
+	    result = value.asLiteral ().getValue ().toString ();
+	  else if (value.isURIResource ())
+	    result = value.asResource ().getLocalName ();
+	  else
+	    logger.error ("value binding was an anonymous node, ignoring");
+	}
       }
-    }
-    finally {
-      exec.close ();
+      finally {
+	exec.close ();
+      }
     }
 
     if (result == null) {
