@@ -30,9 +30,14 @@ public class IndexServlet extends HttpServlet {
 				 "<li><a href='/query'>Query SPARQL</a></li>" +
 				 "<li><a href='/mate'>MATe ontology</a></li>" +
 				 "<li><a href='/mate/sensors'>MATe sensors ontology</a></li>" +
-				 "<li><a href='/world/.n3'>World knowledge data store (N3)</a></li>" +
-				 "<li><a href='/sensors/.n3'>Sensors data store (N3)</a></li>" +
-				 "<li><a href='/history/.n3'>History data store (N3)</a></li>" +
+				 "<li><a href='/world'>World knowledge data store</a>, " +
+				 "<a href='/world/.n3'>(N3)</a></li>" +
+				 "<li><a href='/sensors'>Sensors data store</a>, " +
+				 "<a href='/sensors/.n3'>(N3)</a></li>" +
+				 "<li><a href='/history'>History data store</a>, " +
+				 "<a href='/history/.n3'>(N3)</a></li>" +
+				 "<li><a href='/legacy'>Legacy data store</a>, " +
+				 "<a href='/legacy/.n3'>(N3)</a></li>" +
 				 "</ul></body></html>");
   }
 }

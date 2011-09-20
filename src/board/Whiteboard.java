@@ -237,7 +237,7 @@ public class Whiteboard implements Board, Runnable {
     org.apache.log4j.Logger.getLogger ("de.fuberlin.wiwiss.d2rq").setLevel (org.apache.log4j.Level.ALL);
 
     /* Set up the ModelD2RQ using a mapping file */
-    legacyModel = new ModelD2RQ ("file:d2rq.n3");
+    legacyModel = new ModelD2RQ ("file:d2rq.n3", "N3", "http://localhost/");
     legacyModel.setNsPrefixes (worldModel);
 
     try {
