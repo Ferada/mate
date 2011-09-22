@@ -15,7 +15,7 @@ fi
 
 LIBS=$(echo $LIBS lib/*.jar)
 LOG=$(echo lib/slf4j/slf4j-$LOGGING*.jar)
-JARS=$LIBS $LOG
+JARS="$LIBS $LOG"
 OUT=mate.jar
 
 if [ ! -e $OUT ]; then
