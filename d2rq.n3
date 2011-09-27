@@ -21,14 +21,15 @@ map:mate_channelpriorities a d2rq:ClassMap;
 	# Sorry, I don't know which columns to put into the uriPattern
 	# for "mate_channelpriorities" because the table doesn't have a primary key.
 	# Please specify it manually.
-	d2rq:uriPattern "mate_channelpriorities/@@mate_channelpriorities.username@@/@@mate_channelpriorities.channel@@/@@mate_channelpriorities.priority@@";
+	# d2rq:uriPattern "mate_channelpriorities/@@mate_channelpriorities.username@@/@@mate_channelpriorities.channel@@/@@mate_channelpriorities.priority@@";
+	d2rq:uriPattern "mate_channelpriorities/@@mate_channelpriorities.id@@";
 	d2rq:class vocab:mate_channelpriorities;
 	d2rq:classDefinitionLabel "mate_channelpriorities";
 	.
 map:mate_channelpriorities__label a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_channelpriorities;
 	d2rq:property rdfs:label;
-	d2rq:pattern "mate_channelpriorities #";
+	d2rq:pattern "mate_channelpriorities #@@mate_channelpriorities.id@@";
 	.
 map:mate_channelpriorities_username a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_channelpriorities;
@@ -62,6 +63,13 @@ map:mate_channelpriorities_location a d2rq:PropertyBridge;
 	d2rq:propertyDefinitionLabel "mate_channelpriorities location";
 	d2rq:column "mate_channelpriorities.location";
 	.
+map:mate_channelpriorities_id a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:mate_channelpriorities;
+	d2rq:property vocab:mate_channelpriorities_id;
+	d2rq:propertyDefinitionLabel "mate_channelpriorities id";
+	d2rq:column "mate_channelpriorities.id";
+	d2rq:datatype xsd:int;
+	.
 
 # Table mate_deviceaccesses
 map:mate_deviceaccesses a d2rq:ClassMap;
@@ -69,14 +77,15 @@ map:mate_deviceaccesses a d2rq:ClassMap;
 	# Sorry, I don't know which columns to put into the uriPattern
 	# for "mate_deviceaccesses" because the table doesn't have a primary key.
 	# Please specify it manually.
-	d2rq:uriPattern "mate_deviceaccesses/@@mate_deviceaccesses.device@@";
+	# d2rq:uriPattern "mate_deviceaccesses/@@mate_deviceaccesses.device@@";
+	d2rq:uriPattern "mate_deviceaccesses/@@mate_deviceaccesses.id@@";
 	d2rq:class vocab:mate_deviceaccesses;
 	d2rq:classDefinitionLabel "mate_deviceaccesses";
 	.
 map:mate_deviceaccesses__label a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_deviceaccesses;
 	d2rq:property rdfs:label;
-	d2rq:pattern "mate_deviceaccesses #";
+	d2rq:pattern "mate_deviceaccesses #@@mate_deviceaccesses.id@@";
 	.
 map:mate_deviceaccesses_device a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_deviceaccesses;
@@ -90,6 +99,13 @@ map:mate_deviceaccesses_attribute a d2rq:PropertyBridge;
 	d2rq:propertyDefinitionLabel "mate_deviceaccesses attribute";
 	d2rq:column "mate_deviceaccesses.attribute";
 	.
+map:mate_deviceaccesses_id a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:mate_deviceaccesses;
+	d2rq:property vocab:mate_deviceaccesses_id;
+	d2rq:propertyDefinitionLabel "mate_deviceaccesses id";
+	d2rq:column "mate_deviceaccesses.id";
+	d2rq:datatype xsd:int;
+	.
 
 # Table mate_privacy
 map:mate_privacy a d2rq:ClassMap;
@@ -97,14 +113,15 @@ map:mate_privacy a d2rq:ClassMap;
 	# Sorry, I don't know which columns to put into the uriPattern
 	# for "mate_privacy" because the table doesn't have a primary key.
 	# Please specify it manually.
-	d2rq:uriPattern "mate_privacy/@@mate_privacy.subject@@/@@mate_privacy.object@@/@@mate_privacy.entity@@";
+	# d2rq:uriPattern "mate_privacy/@@mate_privacy.subject@@/@@mate_privacy.object@@/@@mate_privacy.entity@@";
+	d2rq:uriPattern "mate_privacy/@@mate_privacy.id@@";
 	d2rq:class vocab:mate_privacy;
 	d2rq:classDefinitionLabel "mate_privacy";
 	.
 map:mate_privacy__label a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_privacy;
 	d2rq:property rdfs:label;
-	d2rq:pattern "mate_privacy #";
+	d2rq:pattern "mate_privacy #@@mate_privacy.id@@";
 	.
 map:mate_privacy_subject a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_privacy;
@@ -131,6 +148,13 @@ map:mate_privacy_value a d2rq:PropertyBridge;
 	d2rq:column "mate_privacy.value";
 	d2rq:datatype xsd:int;
 	.
+map:mate_privacy_id a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:mate_privacy;
+	d2rq:property vocab:mate_privacy_id;
+	d2rq:propertyDefinitionLabel "mate_privacy id";
+	d2rq:column "mate_privacy.id";
+	d2rq:datatype xsd:int;
+	.
 
 # Table mate_roomdevices
 map:mate_roomdevices a d2rq:ClassMap;
@@ -138,14 +162,15 @@ map:mate_roomdevices a d2rq:ClassMap;
 	# Sorry, I don't know which columns to put into the uriPattern
 	# for "mate_roomdevices" because the table doesn't have a primary key.
 	# Please specify it manually.
-	d2rq:uriPattern "mate_roomdevices/@@mate_roomdevices.room_id@@/@@mate_roomdevices.channel@@";
+	# d2rq:uriPattern "mate_roomdevices/@@mate_roomdevices.room_id@@/@@mate_roomdevices.channel@@";
+	d2rq:uriPattern "mate_roomdevices/@@mate_roomdevices.id@@";
 	d2rq:class vocab:mate_roomdevices;
 	d2rq:classDefinitionLabel "mate_roomdevices";
 	.
 map:mate_roomdevices__label a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_roomdevices;
 	d2rq:property rdfs:label;
-	d2rq:pattern "mate_roomdevices #";
+	d2rq:pattern "mate_roomdevices #@@mate_roomdevices.id@@";
 	.
 map:mate_roomdevices_room_id a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_roomdevices;
@@ -164,6 +189,13 @@ map:mate_roomdevices_jid a d2rq:PropertyBridge;
 	d2rq:property vocab:mate_roomdevices_jid;
 	d2rq:propertyDefinitionLabel "mate_roomdevices jid";
 	d2rq:column "mate_roomdevices.jid";
+	.
+map:mate_roomdevices_id a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:mate_roomdevices;
+	d2rq:property vocab:mate_roomdevices_id;
+	d2rq:propertyDefinitionLabel "mate_roomdevices id";
+	d2rq:column "mate_roomdevices.id";
+	d2rq:datatype xsd:int;
 	.
 
 # Table mate_userdata
@@ -222,14 +254,15 @@ map:mate_userdevices a d2rq:ClassMap;
 	# Sorry, I don't know which columns to put into the uriPattern
 	# for "mate_userdevices" because the table doesn't have a primary key.
 	# Please specify it manually.
-	d2rq:uriPattern "mate_userdevices/@@mate_userdevices.username@@/@@mate_userdevices.channel@@";
+	# d2rq:uriPattern "mate_userdevices/@@mate_userdevices.username@@/@@mate_userdevices.channel@@";
+	d2rq:uriPattern "mate_userdevices/@@mate_userdevices.id@@";
 	d2rq:class vocab:mate_userdevices;
 	d2rq:classDefinitionLabel "mate_userdevices";
 	.
 map:mate_userdevices__label a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_userdevices;
 	d2rq:property rdfs:label;
-	d2rq:pattern "mate_userdevices #";
+	d2rq:pattern "mate_userdevices #@@mate_userdevices.id@@";
 	.
 map:mate_userdevices_username a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_userdevices;
@@ -249,4 +282,10 @@ map:mate_userdevices_jid a d2rq:PropertyBridge;
 	d2rq:propertyDefinitionLabel "mate_userdevices jid";
 	d2rq:column "mate_userdevices.jid";
 	.
-
+map:mate_userdevices_id a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:mate_userdevices;
+	d2rq:property vocab:mate_userdevices_id;
+	d2rq:propertyDefinitionLabel "mate_userdevices id";
+	d2rq:column "mate_userdevices.id";
+	d2rq:datatype xsd:int;
+	.
