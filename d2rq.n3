@@ -1,4 +1,4 @@
-@prefix : <http://www.imis.uni-luebeck.de/legacy#> .
+@prefix : <http://www.imis.uni-luebeck.de/mate/legacy#> .
 @prefix map: <http://www.imis.uni-luebeck.de/legacy#> .
 @prefix db: <http://www.imis.uni-luebeck.de/legacy#> .
 @prefix vocab: <http://www.imis.uni-luebeck.de/mate/legacy#> .
@@ -23,7 +23,7 @@ map:mate_channelpriorities a d2rq:ClassMap;
 	# Please specify it manually.
 	# d2rq:uriPattern "mate_channelpriorities/@@mate_channelpriorities.username@@/@@mate_channelpriorities.channel@@/@@mate_channelpriorities.priority@@";
 	d2rq:uriPattern "mate_channelpriorities/@@mate_channelpriorities.id@@";
-	d2rq:class vocab:mate_channelpriorities;
+	d2rq:class vocab:ChannelPriorities;
 	d2rq:classDefinitionLabel "mate_channelpriorities";
 	.
 map:mate_channelpriorities__label a d2rq:PropertyBridge;
@@ -33,39 +33,39 @@ map:mate_channelpriorities__label a d2rq:PropertyBridge;
 	.
 map:mate_channelpriorities_username a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_channelpriorities;
-	d2rq:property vocab:mate_channelpriorities_username;
+	d2rq:property vocab:username;
 	d2rq:propertyDefinitionLabel "mate_channelpriorities username";
 	d2rq:column "mate_channelpriorities.username";
 	.
 map:mate_channelpriorities_channel a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_channelpriorities;
-	d2rq:property vocab:mate_channelpriorities_channel;
+	d2rq:property vocab:channel;
 	d2rq:propertyDefinitionLabel "mate_channelpriorities channel";
 	d2rq:column "mate_channelpriorities.channel";
 	.
 map:mate_channelpriorities_priority a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_channelpriorities;
-	d2rq:property vocab:mate_channelpriorities_priority;
+	d2rq:property vocab:priority;
 	d2rq:propertyDefinitionLabel "mate_channelpriorities priority";
 	d2rq:column "mate_channelpriorities.priority";
 	d2rq:datatype xsd:int;
 	.
 map:mate_channelpriorities_interruptible a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_channelpriorities;
-	d2rq:property vocab:mate_channelpriorities_interruptible;
+	d2rq:property vocab:interruptible;
 	d2rq:propertyDefinitionLabel "mate_channelpriorities interruptible";
 	d2rq:column "mate_channelpriorities.interruptible";
 	d2rq:datatype xsd:int;
 	.
 map:mate_channelpriorities_location a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_channelpriorities;
-	d2rq:property vocab:mate_channelpriorities_location;
+	d2rq:property vocab:location;
 	d2rq:propertyDefinitionLabel "mate_channelpriorities location";
 	d2rq:column "mate_channelpriorities.location";
 	.
 map:mate_channelpriorities_id a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_channelpriorities;
-	d2rq:property vocab:mate_channelpriorities_id;
+	d2rq:property vocab:id;
 	d2rq:propertyDefinitionLabel "mate_channelpriorities id";
 	d2rq:column "mate_channelpriorities.id";
 	d2rq:datatype xsd:int;
@@ -89,19 +89,19 @@ map:mate_deviceaccesses__label a d2rq:PropertyBridge;
 	.
 map:mate_deviceaccesses_device a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_deviceaccesses;
-	d2rq:property vocab:mate_deviceaccesses_device;
+	d2rq:property vocab:device;
 	d2rq:propertyDefinitionLabel "mate_deviceaccesses device";
 	d2rq:column "mate_deviceaccesses.device";
 	.
 map:mate_deviceaccesses_attribute a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_deviceaccesses;
-	d2rq:property vocab:mate_deviceaccesses_attribute;
+	d2rq:property vocab:attribute;
 	d2rq:propertyDefinitionLabel "mate_deviceaccesses attribute";
 	d2rq:column "mate_deviceaccesses.attribute";
 	.
 map:mate_deviceaccesses_id a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_deviceaccesses;
-	d2rq:property vocab:mate_deviceaccesses_id;
+	d2rq:property vocab:id;
 	d2rq:propertyDefinitionLabel "mate_deviceaccesses id";
 	d2rq:column "mate_deviceaccesses.id";
 	d2rq:datatype xsd:int;
@@ -115,7 +115,7 @@ map:mate_privacy a d2rq:ClassMap;
 	# Please specify it manually.
 	# d2rq:uriPattern "mate_privacy/@@mate_privacy.subject@@/@@mate_privacy.object@@/@@mate_privacy.entity@@";
 	d2rq:uriPattern "mate_privacy/@@mate_privacy.id@@";
-	d2rq:class vocab:mate_privacy;
+	d2rq:class vocab:Privacy;
 	d2rq:classDefinitionLabel "mate_privacy";
 	.
 map:mate_privacy__label a d2rq:PropertyBridge;
@@ -125,32 +125,32 @@ map:mate_privacy__label a d2rq:PropertyBridge;
 	.
 map:mate_privacy_subject a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_privacy;
-	d2rq:property vocab:mate_privacy_subject;
+	d2rq:property vocab:subject;
 	d2rq:propertyDefinitionLabel "mate_privacy subject";
 	d2rq:column "mate_privacy.subject";
 	.
 map:mate_privacy_object a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_privacy;
-	d2rq:property vocab:mate_privacy_object;
+	d2rq:property vocab:object;
 	d2rq:propertyDefinitionLabel "mate_privacy object";
 	d2rq:column "mate_privacy.object";
 	.
 map:mate_privacy_entity a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_privacy;
-	d2rq:property vocab:mate_privacy_entity;
+	d2rq:property vocab:entity;
 	d2rq:propertyDefinitionLabel "mate_privacy entity";
 	d2rq:column "mate_privacy.entity";
 	.
 map:mate_privacy_value a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_privacy;
-	d2rq:property vocab:mate_privacy_value;
+	d2rq:property vocab:value;
 	d2rq:propertyDefinitionLabel "mate_privacy value";
 	d2rq:column "mate_privacy.value";
 	d2rq:datatype xsd:int;
 	.
 map:mate_privacy_id a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_privacy;
-	d2rq:property vocab:mate_privacy_id;
+	d2rq:property vocab:id;
 	d2rq:propertyDefinitionLabel "mate_privacy id";
 	d2rq:column "mate_privacy.id";
 	d2rq:datatype xsd:int;
@@ -164,7 +164,7 @@ map:mate_roomdevices a d2rq:ClassMap;
 	# Please specify it manually.
 	# d2rq:uriPattern "mate_roomdevices/@@mate_roomdevices.room_id@@/@@mate_roomdevices.channel@@";
 	d2rq:uriPattern "mate_roomdevices/@@mate_roomdevices.id@@";
-	d2rq:class vocab:mate_roomdevices;
+	d2rq:class vocab:RoomDevices;
 	d2rq:classDefinitionLabel "mate_roomdevices";
 	.
 map:mate_roomdevices__label a d2rq:PropertyBridge;
@@ -174,25 +174,25 @@ map:mate_roomdevices__label a d2rq:PropertyBridge;
 	.
 map:mate_roomdevices_room_id a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_roomdevices;
-	d2rq:property vocab:mate_roomdevices_room_id;
+	d2rq:property vocab:id;
 	d2rq:propertyDefinitionLabel "mate_roomdevices room_id";
 	d2rq:column "mate_roomdevices.room_id";
 	.
 map:mate_roomdevices_channel a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_roomdevices;
-	d2rq:property vocab:mate_roomdevices_channel;
+	d2rq:property vocab:channel;
 	d2rq:propertyDefinitionLabel "mate_roomdevices channel";
 	d2rq:column "mate_roomdevices.channel";
 	.
 map:mate_roomdevices_jid a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_roomdevices;
-	d2rq:property vocab:mate_roomdevices_jid;
+	d2rq:property vocab:jid;
 	d2rq:propertyDefinitionLabel "mate_roomdevices jid";
 	d2rq:column "mate_roomdevices.jid";
 	.
 map:mate_roomdevices_id a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_roomdevices;
-	d2rq:property vocab:mate_roomdevices_id;
+	d2rq:property vocab:id;
 	d2rq:propertyDefinitionLabel "mate_roomdevices id";
 	d2rq:column "mate_roomdevices.id";
 	d2rq:datatype xsd:int;
@@ -202,7 +202,7 @@ map:mate_roomdevices_id a d2rq:PropertyBridge;
 map:mate_userdata a d2rq:ClassMap;
 	d2rq:dataStorage map:database;
 	d2rq:uriPattern "mate_userdata/@@mate_userdata.id@@";
-	d2rq:class vocab:mate_userdata;
+	d2rq:class vocab:UserData;
 	d2rq:classDefinitionLabel "mate_userdata";
 	.
 map:mate_userdata__label a d2rq:PropertyBridge;
@@ -212,38 +212,38 @@ map:mate_userdata__label a d2rq:PropertyBridge;
 	.
 map:mate_userdata_username a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_userdata;
-	d2rq:property vocab:mate_userdata_username;
+	d2rq:property vocab:username;
 	d2rq:propertyDefinitionLabel "mate_userdata username";
 	d2rq:column "mate_userdata.username";
 	.
 map:mate_userdata_forename a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_userdata;
-	d2rq:property vocab:mate_userdata_forename;
+	d2rq:property vocab:forename;
 	d2rq:propertyDefinitionLabel "mate_userdata forename";
 	d2rq:column "mate_userdata.forename";
 	.
 map:mate_userdata_surname a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_userdata;
-	d2rq:property vocab:mate_userdata_surname;
+	d2rq:property vocab:surname;
 	d2rq:propertyDefinitionLabel "mate_userdata surname";
 	d2rq:column "mate_userdata.surname";
 	.
 map:mate_userdata_id a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_userdata;
-	d2rq:property vocab:mate_userdata_id;
+	d2rq:property vocab:id;
 	d2rq:propertyDefinitionLabel "mate_userdata id";
 	d2rq:column "mate_userdata.id";
 	d2rq:datatype xsd:int;
 	.
 map:mate_userdata_cc a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_userdata;
-	d2rq:property vocab:mate_userdata_cc;
+	d2rq:property vocab:cc;
 	d2rq:propertyDefinitionLabel "mate_userdata cc";
 	d2rq:column "mate_userdata.cc";
 	.
 map:mate_userdata_room_id a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_userdata;
-	d2rq:property vocab:mate_userdata_room_id;
+	d2rq:property vocab:id;
 	d2rq:propertyDefinitionLabel "mate_userdata room_id";
 	d2rq:column "mate_userdata.room_id";
 	.
@@ -256,7 +256,7 @@ map:mate_userdevices a d2rq:ClassMap;
 	# Please specify it manually.
 	# d2rq:uriPattern "mate_userdevices/@@mate_userdevices.username@@/@@mate_userdevices.channel@@";
 	d2rq:uriPattern "mate_userdevices/@@mate_userdevices.id@@";
-	d2rq:class vocab:mate_userdevices;
+	d2rq:class vocab:UserDevices;
 	d2rq:classDefinitionLabel "mate_userdevices";
 	.
 map:mate_userdevices__label a d2rq:PropertyBridge;
@@ -266,25 +266,25 @@ map:mate_userdevices__label a d2rq:PropertyBridge;
 	.
 map:mate_userdevices_username a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_userdevices;
-	d2rq:property vocab:mate_userdevices_username;
+	d2rq:property vocab:username;
 	d2rq:propertyDefinitionLabel "mate_userdevices username";
 	d2rq:column "mate_userdevices.username";
 	.
 map:mate_userdevices_channel a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_userdevices;
-	d2rq:property vocab:mate_userdevices_channel;
+	d2rq:property vocab:channel;
 	d2rq:propertyDefinitionLabel "mate_userdevices channel";
 	d2rq:column "mate_userdevices.channel";
 	.
 map:mate_userdevices_jid a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_userdevices;
-	d2rq:property vocab:mate_userdevices_jid;
+	d2rq:property vocab:jid;
 	d2rq:propertyDefinitionLabel "mate_userdevices jid";
 	d2rq:column "mate_userdevices.jid";
 	.
 map:mate_userdevices_id a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:mate_userdevices;
-	d2rq:property vocab:mate_userdevices_id;
+	d2rq:property vocab:id;
 	d2rq:propertyDefinitionLabel "mate_userdevices id";
 	d2rq:column "mate_userdevices.id";
 	d2rq:datatype xsd:int;
