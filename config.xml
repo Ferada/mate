@@ -12,4 +12,6 @@
   <entry key="sms">false</entry>
   <entry key="languages">en,de</entry>
   <entry key="web.port">8000</entry>
+  <entry key="d2rq.configuration">d2rq.n3</entry>
+  <entry key="d2rq.baseurl">http://localhost/</entry>
 </properties>

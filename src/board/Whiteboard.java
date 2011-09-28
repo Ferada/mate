@@ -236,8 +236,10 @@ public class Whiteboard implements Board, Runnable {
     /* TODO: d2rq doesn't use slf4j; nevertheless this needs a configuration option */
     org.apache.log4j.Logger.getLogger ("de.fuberlin.wiwiss.d2rq").setLevel (org.apache.log4j.Level.ALL);
 
+    Model mapping = loadD2RQConfiguration (options);
+
     /* Set up the ModelD2RQ using a mapping file */
-    legacyModel = new ModelD2RQ ("file:d2rq.n3", "N3", "http://localhost/");
+    legacyModel = new ModelD2RQ (mapping, options.d2rqBaseURL);
     legacyModel.setNsPrefixes (worldModel);
 
     try {
@@ -1037,5 +1039,43 @@ public class Whiteboard implements Board, Runnable {
 	return label;
     }
     return resource.getLabel (null);
+  }
+
+  /**
+   * Inserts the database connection options into the RDF model for D2RQ.
+   * @param pathname Where the initial N3 file is loaded from.
+   * @return The resulting model.
+   */
+  public static Model loadD2RQConfiguration (Options options) throws FileNotFoundException {
+    Model model = loadRdf (options.d2rqConfiguration, "N3");
+
+    Resource database = model.createResource ("http://www.imis.uni-luebeck.de/legacy#database");
+    final String d2rq = "http://www.wiwiss.fu-berlin.de/suhl/bizer/D2RQ/0.1#";
+
+    /*
+      inserts some statements like the following block:
+
+      map:database a d2rq:Database;
+        d2rq:jdbcDriver "org.postgresql.Driver";
+	d2rq:jdbcDSN "jdbc:postgresql://localhost/mate";
+	d2rq:username "mate";
+	d2rq:password "password".
+    */
+
+    model.add (model.createStatement (database, RDF.type, model.createResource (d2rq + "Database")));
+    model.add (model.createStatement (database,
+				      model.createProperty (d2rq, "jdbcDriver"),
+				      model.createLiteral (options.jdbcDriver, false)));
+    model.add (model.createStatement (database,
+				      model.createProperty (d2rq, "jdbcDSN"),
+				      model.createLiteral (options.jdbcUrl, false)));
+    model.add (model.createStatement (database,
+				      model.createProperty (d2rq, "username"),
+				      model.createLiteral (options.jdbcUsername, false)));
+    model.add (model.createStatement (database,
+				      model.createProperty (d2rq, "password"),
+				      model.createLiteral (options.jdbcPassword, false)));
+
+    return model;
   }
 }

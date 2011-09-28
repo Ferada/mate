@@ -34,6 +34,8 @@ public class Options {
   private ArgumentAcceptingOptionSpec<String> reasonerOpt;
   private ArgumentAcceptingOptionSpec<String> languagesOpt;
   private ArgumentAcceptingOptionSpec<String> webPortOpt;
+  private ArgumentAcceptingOptionSpec<String> d2rqConfigurationOpt;
+  private ArgumentAcceptingOptionSpec<String> d2rqBaseURLOpt;
 
   private Map<ArgumentAcceptingOptionSpec, String> map;
 
@@ -55,6 +57,8 @@ public class Options {
   public String reasoner;
   public List<String> languages;
   public int webPort;
+  public String d2rqConfiguration;
+  public String d2rqBaseURL;
 
   private Options () {
     map = new HashMap<ArgumentAcceptingOptionSpec, String> ();
@@ -118,6 +122,14 @@ public class Options {
 	  map.put (webPortOpt = acceptsAll (asList ("web.port"), "port for the web server")
 		   .withRequiredArg (),
 		   "web.port");
+
+	  map.put (d2rqConfigurationOpt = acceptsAll (asList ("d2rq.configuration"), "d2rq mapping file")
+		   .withRequiredArg (),
+		   "d2rq.configuration");
+
+	  map.put (d2rqBaseURLOpt = acceptsAll (asList ("d2rq.baseurl"), "base URL for the d2rq mapping")
+		   .withRequiredArg (),
+		   "d2rq.baseurl");
 	}
       };
   }
@@ -195,6 +207,9 @@ public class Options {
     catch (NumberFormatException e) {
       throw new RuntimeException ("web port should be a number", e);
     }
+
+    d2rqConfiguration = set (d2rqConfigurationOpt);
+    d2rqBaseURL = set (d2rqBaseURLOpt);
   }
 
   public synchronized void printHelpOn (OutputStream sink) throws IOException {

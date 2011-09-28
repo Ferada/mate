@@ -8,13 +8,6 @@
 @prefix d2rq: <http://www.wiwiss.fu-berlin.de/suhl/bizer/D2RQ/0.1#> .
 @prefix jdbc: <http://d2rq.org/terms/jdbc/> .
 
-map:database a d2rq:Database;
-	d2rq:jdbcDriver "org.postgresql.Driver";
-	d2rq:jdbcDSN "jdbc:postgresql://localhost/mate";
-	d2rq:username "mate";
-	d2rq:password "password";
-	.
-
 # Table mate_channelpriorities
 map:mate_channelpriorities a d2rq:ClassMap;
 	d2rq:dataStorage map:database;
