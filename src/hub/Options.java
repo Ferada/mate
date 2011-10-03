@@ -150,13 +150,19 @@ public class Options {
     String name = map.get (spec);
     if (!set.has (spec)) {
       String value = properties.getProperty (name);
-      if (value != null)
-	spec.defaultsTo (value);
+      if (value != null ) {
+	String[] split = value.split (separator);
+	if (split.length == 1)
+	  spec.defaultsTo (split[0]);
+	else if (split.length > 1) {
+	  String[] copy = Arrays.copyOfRange (split, 1, split.length);
+	  spec.defaultsTo (split[0], copy);
+	}
+      }
     }
     List<String> result = set.valuesOf (spec);
     logger.trace (name + " = " + result);
     return result;
-
   }
 
   public synchronized void parse (String args[]) throws Exception {
