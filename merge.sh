@@ -25,6 +25,7 @@ fi
 mkdir -p bin/META-INF
 cp -u manifest.mf bin/META-INF/MANIFEST.MF
 
-cd bin
+zip -u $OUT log4j.properties
 
+cd bin
 exec find . -type f -print0 | xargs -0 zip -u ../$OUT

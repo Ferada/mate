@@ -114,7 +114,7 @@ public class Options {
 		   "sms");
 
 	  map.put (reasonerOpt = acceptsAll (asList ("board.reasoner"), "reasoner implementation")
-		   .withRequiredArg ().defaultsTo ("full"),
+		   .withRequiredArg (),
 		   "board.reasoner");
 
 	  map.put (languagesOpt = acceptsAll (asList ("languages"), "language preferences for ontology meta-information")
