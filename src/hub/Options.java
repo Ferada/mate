@@ -33,6 +33,7 @@ public class Options {
   private ArgumentAcceptingOptionSpec<String> smsOpt;
   private ArgumentAcceptingOptionSpec<String> reasonerOpt;
   private ArgumentAcceptingOptionSpec<String> languagesOpt;
+  private ArgumentAcceptingOptionSpec<String> webOpt;
   private ArgumentAcceptingOptionSpec<String> webPortOpt;
   private ArgumentAcceptingOptionSpec<String> d2rqConfigurationOpt;
   private ArgumentAcceptingOptionSpec<String> d2rqBaseURLOpt;
@@ -56,6 +57,7 @@ public class Options {
   public boolean sms;
   public String reasoner;
   public List<String> languages;
+  public boolean web;
   public int webPort;
   public String d2rqConfiguration;
   public String d2rqBaseURL;
@@ -118,6 +120,10 @@ public class Options {
 	  map.put (languagesOpt = acceptsAll (asList ("languages"), "language preferences for ontology meta-information")
 		   .withRequiredArg ().withValuesSeparatedBy (','),
 		   "languages");
+
+	  map.put (webOpt = acceptsAll (asList ("web"), "enable web server")
+		   .withOptionalArg (),
+		   "web");
 
 	  map.put (webPortOpt = acceptsAll (asList ("web.port"), "port for the web server")
 		   .withRequiredArg (),
@@ -206,6 +212,8 @@ public class Options {
     languages = setList (languagesOpt, ",");
     if (languages.isEmpty ())
       throw new RuntimeException ("languages is empty");
+
+    web = Boolean.valueOf (set (webOpt));
 
     try {
       webPort = Integer.valueOf (set (webPortOpt)).intValue ();

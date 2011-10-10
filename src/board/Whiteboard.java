@@ -242,13 +242,15 @@ public class Whiteboard implements Board, Runnable {
     legacyModel = new ModelD2RQ (mapping, options.d2rqBaseURL);
     legacyModel.setNsPrefixes (worldModel);
 
-    try {
-      /* it's no error if this doesn't work though */
-      runWebServer (options.webPort);
-    }
-    catch (Exception e) {
-      logger.error ("couldn't run web server: " + e);
-      logger.error (writeToString (e));
+    if (options.web) {
+      try {
+        /* it's no error if this doesn't work though */
+        runWebServer (options.webPort);
+      }
+      catch (Exception e) {
+        logger.error ("couldn't run web server: " + e);
+        logger.error (writeToString (e));
+      }
     }
   }
 

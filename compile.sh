@@ -14,4 +14,4 @@ fi
 
 CLASSPATH=.:bin:src:$(echo lib/*.jar | tr ' ' ':')
 
-javac -d bin -Xlint:{unchecked,deprecation} -cp $CLASSPATH $FILES
+javac -d bin -Xlint -cp $CLASSPATH $FILES
