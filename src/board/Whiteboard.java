@@ -435,14 +435,9 @@ public class Whiteboard implements Board, Runnable {
   }
 
   /**
-   * Checks whether a model is consistent with respect to the given
-   * ontology.  This works by using the {@link InfModel#validate} method of
-   * the ontology model and checking the result using
-   * {@link ValidityResult#isClean}.  Although some of the errors may just
-   * be warnings, we consider them as errors.  This is method is
-   * particularly slow, so using it is suggested only for testing purposes.
+   * Implements the {@link #isConsistent} method for profiling purposes.
    */
-  public boolean isConsistent (MateOntology ontology, com.hp.hpl.jena.reasoner.Reasoner reasoner, Model model) {
+  public boolean isConsistentHelper (MateOntology ontology, com.hp.hpl.jena.reasoner.Reasoner reasoner, Model model) {
     // consistency checking on every posted model
     InfModel infmodel = ModelFactory.createInfModel (reasoner, model);
     ValidityReport validity = infmodel.validate ();
@@ -460,6 +455,22 @@ public class Whiteboard implements Board, Runnable {
 	logger.error (it.next ().toString ());
     logger.trace (writeToString (model));
     return false;
+  }
+
+  /**
+   * Checks whether a model is consistent with respect to the given
+   * ontology.  This works by using the {@link InfModel#validate} method of
+   * the ontology model and checking the result using
+   * {@link ValidityResult#isClean}.  Although some of the errors may just
+   * be warnings, we consider them as errors.  This is method is
+   * particularly slow, so using it is suggested only for testing purposes.
+   */
+  public boolean isConsistent (MateOntology ontology, com.hp.hpl.jena.reasoner.Reasoner reasoner, Model model) {
+    long start = System.nanoTime ();
+    boolean result = isConsistentHelper (ontology, reasoner, model);
+    long estimate = System.nanoTime () - start;
+    logger.trace ("isConsistent took about " + (estimate / 1000000000.0) + "s");
+    return result;
   }
 
   /**
