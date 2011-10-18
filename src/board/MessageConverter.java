@@ -141,7 +141,8 @@ public class MessageConverter {
 				      ResourceFactory.createResource (sensorURI.toString ())));
 
     model.add (model.createStatement (marker,
-				      Sensors.property ("userID"),
+				      Mate.property ("userID"),
+				      //Sensors.property ("userID"),
 				      ResourceFactory.createTypedLiteral (userID, XSDDatatype.XSDstring)));
 
    /* TODO: what about rooms? */

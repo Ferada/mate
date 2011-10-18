@@ -293,69 +293,6 @@ public class Whiteboard implements Board, Runnable {
     
   }
 
-  public static void main (String args[]) throws Exception {
-    Options options = Options.getInstance ();
-    boolean exit = false;
-    try {
-      options.parse (args);
-    }
-    catch (Exception e) {
-      logger.error (writeToString (e));
-    }
-
-    if (exit || options.help) {
-      System.out.println ("Usage: board.Whiteboard [OPTION]...");
-      options.printHelpOn (System.out);
-      return;
-    }
-    if (options.version) {
-      System.out.println ("MATe Whiteboard (c) 2011");
-      return;
-    }
-
-    Whiteboard board = new Whiteboard (options);
-
-    Thread thread = new Thread (board, "whiteboard event thread");
-    thread.start ();
-
-    Model sample1 = loadRdf ("sample1.n3", "N3");
-    Model sample2 = loadRdf ("sample2.n3", "N3");
-    Model sample3 = loadRdf ("sample3.n3", "N3");
-    Model sample4 = loadRdf ("sample4.n3", "N3");
-
-    LoggingClient client = new LoggingClient ();
-    LoggingReasoner reasoner = new LoggingReasoner ();
-
-    board.registerClient (client);
-    board.registerClient (reasoner);
-
-    board.postSensorUpdate (sample1);
-    board.postSensorUpdate (sample2);
-
-    LoggingCombiner combiner = new LoggingCombiner ();
-    board.registerCombiner (Mate.resource ("AvailabilityResult").getURI (), combiner);
-
-    board.postWorldUpdate (client, sample3);
-    board.postWorldUpdate (reasoner, sample4);
-
-    Query query = QueryFactory.read ("file:query1.sparql");
-    QueryExecution exec = board.query (query);
-    logger.info ("running query " + query);
-    try {
-      ResultSet results = exec.execSelect ();
-      while (results.hasNext ()) {
-    	QuerySolution solution = results.next ();
-
-	logger.trace ("solution " + solution);
-      }
-    }
-    finally {
-      exec.close ();
-    }
-
-    thread.join ();
-  }
-
   /**
    * Runs a web server for displaying information and allowing SPARQL/UL
    * access to stored information.

@@ -6,23 +6,45 @@
 @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix mate:    <http://www.imis.uni-luebeck.de/mate#> .
 
-:AvailabilityResult
-      a       owl:Class ;
-      :ignoreIndex "true"^^xsd:boolean ;
-      rdfs:label "Verfügbarkeitsresultat"@de , "Availability Result"@en ;
-      :primaryKey :AvailabilityKey .
+# unused
 
-:Person
-      a       owl:Class ;
-      :ignoreIndex "true"^^xsd:boolean ;
-      rdfs:label "Person" ;
-      owl:equivalentClass foaf:Person .
+# :Person
+#       a       owl:Class ;
+#       :ignoreIndex "true"^^xsd:boolean ;
+#       rdfs:label "Person" ;
+#       owl:equivalentClass foaf:Person .
 
-:AvailabilityResultMod
-      a       owl:Class ;
-      :ignoreIndex "true"^^xsd:boolean ;
-      rdfs:label "Availability Result (modified)"@en , "Verfügbarkeitsresultat (modifiziert)"@de ;
-      :primaryKey :AvailabilityModKey .
+# examples for LoggingCombiner
+
+# :AvailabilityResult
+#       a       owl:Class ;
+#       :ignoreIndex "true"^^xsd:boolean ;
+#       rdfs:label "Verfügbarkeitsresultat"@de , "Availability Result"@en ;
+#       :primaryKey :AvailabilityKey .
+
+# :AvailabilityResultMod
+#       a       owl:Class ;
+#       :ignoreIndex "true"^^xsd:boolean ;
+#       rdfs:label "Availability Result (modified)"@en , "Verfügbarkeitsresultat (modifiziert)"@de ;
+#       :primaryKey (:jid) .
+
+# :available
+#       a       owl:DatatypeProperty ;
+#       rdfs:domain
+#               [ a       owl:Class ;
+#                 owl:unionOf (:AvailabilityResult :HistoryEntry :AvailabilityResultMod)
+#               ] ;
+#       rdfs:label "available"@en , "verfügbar"@de ;
+#       rdfs:range xsd:boolean .
+
+# :jid
+#       a       owl:DatatypeProperty ;
+#       rdfs:domain
+#               [ a       owl:Class ;
+#                 owl:unionOf (:AvailabilityResult :HistoryEntry :AvailabilityResultMod)
+#               ] ;
+#       rdfs:label "Jabber ID" ;
+#       rdfs:range xsd:string .
 
 <http://www.imis.uni-luebeck.de/mate>
       a       owl:Ontology ;
@@ -45,35 +67,18 @@
 :ignoreIndex
       a       owl:AnnotationProperty ;
       rdfs:domain owl:Class ;
-      rdfs:range xsd:boolean .
-
-:AvailabilityKey
-      a       :PropertyList ;
-      rdf:first :jid ;
-      rdf:rest () .
-
-:jid
-      a       owl:DatatypeProperty ;
-      rdfs:domain
-              [ a       owl:Class ;
-                owl:unionOf (:AvailabilityResult :HistoryEntry :AvailabilityResultMod)
-              ] ;
-      rdfs:label "Jabber ID" ;
-      rdfs:range xsd:string .
+      rdfs:range xsd:boolean ;
+      rdfs:comment """Die markierte Klasse wird während des Einlesens
+        ignoriert, d.h. es wird nicht nach einem Primärschlüssel gesucht
+        und anschließend eine Warnung ausgegeben."""@de ,
+                   """The marked class will be ignored during initialization,
+        i.e. there will be no warning when a class couldn't be used because
+        there was no primary key defined."""@en .
 
 :HistoryEntry
       a       owl:Class ;
       :ignoreIndex "true"^^xsd:boolean ;
       rdfs:label "History Entry"@en , "History-Eintrag"@de .
-
-:available
-      a       owl:DatatypeProperty ;
-      rdfs:domain
-              [ a       owl:Class ;
-                owl:unionOf (:AvailabilityResult :HistoryEntry :AvailabilityResultMod)
-              ] ;
-      rdfs:label "available"@en , "verfügbar"@de ;
-      rdfs:range xsd:boolean .
 
 :PropertyList
       a       owl:Class ;
@@ -115,11 +120,6 @@
       rdfs:domain owl:Class ;
       rdfs:range :PropertyList ;
       rdfs:label "extract explicit"@en , "extrahiere explizit"@de .
-
-:AvailabilityModKey
-      a       :PropertyList ;
-      rdf:first :jid ;
-      rdf:rest () .
 
 # TODO: narf, duplicating sensors stuff, should we use sameAs or some other convention?
 

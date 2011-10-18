@@ -136,7 +136,7 @@ public class TestSensorReasoner extends LoggingReasoner {
     String activity = state.getLocalName ();
     logger.info ("got a new cube state = " + activity);
 
-    Literal userId = marker.getProperty (Sensors.property ("userID")).getLiteral ();
+    Literal userId = marker.getProperty (Mate.property ("userID")).getLiteral ();
     String username = userId.getString ();
 
     // interruptibility
@@ -156,7 +156,7 @@ public class TestSensorReasoner extends LoggingReasoner {
     String frequency = frequencyResource.getLocalName ();
     logger.info ("got a new desktop state = " + program + ", " + frequency);
 
-    Literal userId = marker.getProperty (Sensors.property ("userID")).getLiteral ();
+    Literal userId = marker.getProperty (Mate.property ("userID")).getLiteral ();
     String username = userId.getString ();
 
     // activity
