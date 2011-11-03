@@ -32,17 +32,10 @@
       rdfs:comment "Jabber ID of the sensor this value originated from."@en ,
                    "Jabber-ID des Sensors von dem dieser Wert stammt."@de .
 
-:userID
-      a       owl:DatatypeProperty ;
-      rdfs:domain :SensorValue ;
-      rdfs:range xsd:string ;
-      rdfs:label "Benutzer-ID"@de , "user ID"@en ;
-      rdfs:comment "ID of the user this value is meant for."@en ,
-                   "ID des Benutzers für den dieser Wert bestimmt ist."@de .
-
 :roomID
       a       owl:ObjectProperty ;
       rdfs:domain :SensorValue ;
+      rdfs:range owl:Thing ;
       rdfs:label "Room-ID"@de , "room ID"@en ;
       rdfs:comment "ID of the room this value is meant for."@en ,
                    "ID des Raums für den dieser Wert bestimmt ist."@de .
