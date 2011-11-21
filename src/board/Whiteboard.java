@@ -129,7 +129,7 @@ public class Whiteboard implements Board, Runnable {
   private Map<String, Combiner> combiners;
 
   /**
-   *
+   * Contains mapped values from the legacy database.
    */
   public Model legacyModel;  
 
@@ -881,6 +881,7 @@ public class Whiteboard implements Board, Runnable {
     source.addNamedModel ("http://www.imis.uni-luebeck.de/mate/graphs#world", worldModel);
     source.addNamedModel ("http://www.imis.uni-luebeck.de/mate/graphs#sensor", sensorValues);
     source.addNamedModel ("http://www.imis.uni-luebeck.de/mate/graphs#history", historyValues);
+    source.addNamedModel ("http://www.imis.uni-luebeck.de/mate/graphs#legacy", legacyModel);
 
     return QueryExecutionFactory.create (query, source);
   }
