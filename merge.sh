@@ -17,15 +17,32 @@ LIBS=$(echo $LIBS lib/*.jar)
 LOG=$(echo lib/slf4j/slf4j-$LOGGING*.jar)
 JARS="$LIBS $LOG"
 OUT=mate.jar
+UNPACKED=unpacked
+ZIPOPTS=-1
 
 if [ ! -e $OUT ]; then
-    zipmerge $OUT $JARS
+    echo "creating $OUT from jars"
+    if which zipmergee > /dev/null; then
+        echo "using zipmerge"
+        zipmerge $OUT $JARS
+    else
+        echo "no zipmerge, falling back to unpacking and zipping"
+        mkdir -p $UNPACKED
+        pushd $UNPACKED
+        for JAR in $JARS; do
+            unzip ../$JAR
+            zip $ZIPOPTS ../$OUT -r *
+            rm -Rf *
+        done
+        popd
+        rm -Rf $UNPACKED
+    fi
 fi
 
 mkdir -p bin/META-INF
 cp -u manifest.mf bin/META-INF/MANIFEST.MF
 
-zip -u $OUT log4j.properties
+zip $ZIPOPTS -u $OUT log4j.properties
 
 cd bin
 exec find . -type f -print0 | xargs -0 zip -u ../$OUT
